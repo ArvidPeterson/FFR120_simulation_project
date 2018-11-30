@@ -30,5 +30,7 @@ class Rat(AgentSuper):  # inherits AgentSuper
             elif coordinate < 0:
                 coordinate = self.grid_size
 
+        return [self.x, self.y]
+
 
 
