@@ -6,10 +6,10 @@ from AgentSuper import AgentSuper
 ''' Rat class '''
 
 
-class Rat(AgentSuper):
+class Rat(AgentSuper):  # inherits AgentSuper
 
     def __init__(self, grid_size, x_start, y_start, life_time):
-        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
+        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)  # calls AgentSuper.__init-- as well
 
     def move(self):
 
