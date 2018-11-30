@@ -2,11 +2,11 @@ from AgentSuper import AgentSuper
 from Rat import Rat
 import numpy as np
 
-class Bird(SuperAgent):
+class Bird(AgentSuper):
      def __init__(self, x_nest = None, y_nest = None):
          super().__init__(self)
-         all_positions =
-         self.is_in_nest
+         #all_positions =
+         self.is_in_nest = True
          self.has_nest = False
 
 
@@ -16,17 +16,21 @@ class Bird(SuperAgent):
          nest_x = available_positions(pick_position, 1)
          nest_y = available_positions(pick_position, 2)
 
-         return next_x,nest_y
+         return nest_x, nest_y
 
      def check_is_in_nest(self):
-         boolean = randint(0,1)
+         return self.is_in_nest
 
-         if boolean == 0:
-             is_in_nest = False
-         else:
-             is_in_nest = True
+'''
+     def check_is_in_nest(self):
+         boolean = np.random.randint(0,1)
+        boolean = 1
+        if boolean == 0:
+            is_in_nest = False
+        else:
+            is_in_nest = True
+'''
 
-         return is_in_nest
     def __init__(self, x, y, grid_size):
         super().__init__(self, x, y)
         self.x_nest
