@@ -25,7 +25,9 @@ class Lattice:
         self.rat_list = []
         self.nest_list = []
         self.step_count = 0
+        self.plot_matrix = np.zeros(self.shape)
         self.fig, self.environment_ax, self.anim = self.init_plot()
+
 
     def init_topology(self):
         padding_percentage = .2
@@ -33,6 +35,8 @@ class Lattice:
         possible_topological_values = list(map(int, np.linspace(1, self.maximum_peak_height, self.maximum_peak_height)))
         island_topology = np.random.choice(possible_topological_values, size=island_bounds)
         # todo: fix the topological implementation
+        # save this implementation for later versions though!
+
 
     def run_simulation(self):
         for i_step in range(self.n_steps):
@@ -54,10 +58,11 @@ class Lattice:
 
     def step(self):
         self.step_rats()
-        self.step_birds()
-        self.kill_birds_and_nests()
-        self.build_nests()
-        self.hatch()
+        #self.step_birds()
+        #self.kill_birds_and_nests()
+        #self.build_nests()
+        #self.hatch()
+        self.plot_matrix
         self.step_count += 1
 
     def hatch(self):
@@ -75,7 +80,10 @@ class Lattice:
 
     def move_rats(self):
         for rat in self.rat_list:
-            rat.step()
+            self.location_matrix[rat.x][rat.y].remove(rat)
+            x, y =  rat.move()
+            self.location_matrix[x][y].append(rat)
+
 
     def move_birds(self):
         for bird in self.bird_list:
@@ -107,7 +115,7 @@ class Lattice:
         return fig, environment_ax, anim
 
     def update_plot(self, i):
-        # --- we probably want to use trisurf here! --- #
+        self.environment_ax.pcolor(self.plot_matrix)
         pass
 
 
