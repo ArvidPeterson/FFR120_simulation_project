@@ -11,4 +11,3 @@ class Bird(SuperAgent):
          self.has_nest = False
          self.x = x
          self.y = y
-

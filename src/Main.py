@@ -5,7 +5,5 @@
 # define private class variables starting with an underscore:
 # example: _private_variable
 
-
-
 if __name__ == '__main__':
     print("hello complex simulations!")
