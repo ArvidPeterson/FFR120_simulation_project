@@ -2,6 +2,7 @@ from AgentSuper import AgentSuper
 from Rat import Rat
 import numpy as np
 
+
 class Bird(AgentSuper):
 
     def __init__(self, x, y, grid_size):
