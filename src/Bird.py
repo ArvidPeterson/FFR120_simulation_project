@@ -61,15 +61,3 @@ class Bird(AgentSuper):
 
     def is_rat(self, x):
         return isinstance(x, Rat)
-
-
-        # nest.x, nest.y
-     def __init__(self, x, y):
-         super().__init__(self, x, y)
-         self.x_nest
-         self.y_nest
-         self.is_in_nest
-         self.nest
-         self.has_nest = False
-         self.x = x
-         self.y = y
