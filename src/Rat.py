@@ -6,10 +6,10 @@ from AgentSuper import AgentSuper
 ''' Rat class '''
 
 
-class Rat(AgentSuper):
+class Rat(AgentSuper):  # inherits AgentSuper
 
     def __init__(self, grid_size, x_start, y_start, life_time):
-        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
+        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)  # calls AgentSuper.__init-- as well
 
     def move(self):
 
@@ -29,6 +29,8 @@ class Rat(AgentSuper):
                 coordinate = 0
             elif coordinate < 0:
                 coordinate = self.grid_size
+
+        return [self.x, self.y]
 
 
 
