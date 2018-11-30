@@ -1,4 +1,5 @@
-from SuperAgent import SuperAgent
+from AgentSuper import AgentSuper
+from Rat import Rat
 import numpy as np
 
 class Bird(SuperAgent):
