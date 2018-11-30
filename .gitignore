@@ -2,3 +2,4 @@ venv/
 .idea/
 .DS_Store
 test_files/
+__pycache__

@@ -11,7 +11,7 @@ class Rat(AgentSuper):
     def __init__(self, grid_size, x_start, y_start, life_time):
         AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
 
-    def update_position(self):
+    def move(self):
 
         direction = np.random.randi(4)
 
