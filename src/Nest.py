@@ -1,4 +1,3 @@
-import numpy as np
 from AgentSuper import AgentSuper
 
 
@@ -23,8 +22,7 @@ class Nest(AgentSuper):
         return self.incubation_time>hatch_time
 
     def hatch(self):
-        lattice.spawn(self)
+        if check_hatch():
+            lattice.spawn(self)
 
-    def die(self):
-        lattice.nest_list(self, remove)
-        del self'''
+    '''
