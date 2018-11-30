@@ -18,4 +18,3 @@ class AgentSuper:
     def check_age(self):
 
         return self.age < self.life_time
-    # pajskal

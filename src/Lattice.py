@@ -8,7 +8,7 @@ from Rat import *
 
 
 # todo: visualize the random walk of the rats
-# todo: visualize the topological environmenth
+# todo: visualize the topological environment
 class Lattice:
 
 
@@ -108,12 +108,16 @@ class Lattice:
                 self.nest_list.append(nest)
 
     def init_plot(self):
-        fig = plt.figure()
-        environment_ax = fig.add_subplot(111)
-        anim = Animation.FuncAnimation(environment_ax, self.update_plot())
+        fig = plt.figure()  # create a figure
+        environment_ax = fig.add_subplot(111)  # get ax
+        self.rat_plot, = environment_ax.plot([], [], ls='', color='brown')
+        self.bird_plot, environment_ax.plot([], [], ls='', color='yellow')
+        self.nest_plot, environment_ax.plot([], [], ls='', color='green')
+        anim = Animation.FuncAnimation(environment_ax, self.update_plot())  # ????
         return fig, environment_ax, anim
 
     def update_plot(self, i):
+        # --- we probably want to use trisurf here! --- #
         self.environment_ax.pcolor(self.plot_matrix)
         pass
 
