@@ -4,7 +4,8 @@ import numpy as np
 
 
 class Bird(AgentSuper):
-<<<<<<< HEAD
+
+
      def __init__(self, x_nest = None, y_nest = None):
          super().__init__(self)
          #all_positions =
@@ -42,8 +43,6 @@ class Bird(AgentSuper):
         else:
             is_in_nest = True
 '''
-=======
->>>>>>> 5f452a8a5f87e2df4af13168b7ec8e3479bdb1ea
 
 
     def __init__(self, x, y, grid_size):
