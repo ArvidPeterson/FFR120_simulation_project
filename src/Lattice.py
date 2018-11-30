@@ -1,5 +1,4 @@
 import numpy as np
-import SuperAgentClass as SuperAgent
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 from Bird import *
@@ -13,14 +12,14 @@ from Rat import *
 class Lattice:
 
 
-    def __init__(self, size, n_agents):
+    def __init__(self, size, n_rats, n_birds):
         self.size = size
         self.shape = (size, size)
         self.topological_matrix = np.zeros(self.shape)
         self.maximum_peak_height = 100
         self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
-        self.n_birds = 100
-        self.n_rats = 100
+        self.n_birds = n_birds
+        self.n_rats = n_rats
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -32,7 +31,7 @@ class Lattice:
     def init_topology(self):
         padding_percentage = .2
         island_bounds = (padding_percentage, self.size - padding_percentage)
-        possible_topological_values = list(map(int, np.linspace(1, self.maximum_peak_height, self.maximum_peak_height)))
+        possible_topological_values =  np.linspace(1, self.maximum_peak_height, self.maximum_peak_height, dtype=int)
         island_topology = np.random.choice(possible_topological_values, size=island_bounds)
         # todo: fix the topological implementation
         # save this implementation for later versions though!
@@ -44,7 +43,7 @@ class Lattice:
 
     def init_agents(self):
         for i_bird in range(self.n_birds):
-            x, y = gen_starting_pos()
+            x, y = self.gen_starting_pos()
             bird = Bird(x, y)
             nest = bird.place_nest()
             self.bird_list.append(bird)
@@ -62,7 +61,7 @@ class Lattice:
         #self.kill_birds_and_nests()
         #self.build_nests()
         #self.hatch()
-        self.plot_matrix
+        self.update_plot_matrix
         self.step_count += 1
 
     def hatch(self):
@@ -119,4 +118,5 @@ class Lattice:
         pass
 
 
-
+if __name__ == '__main__':
+    lattice = Lattice(100, 10)
