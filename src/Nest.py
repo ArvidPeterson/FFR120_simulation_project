@@ -1,6 +1,6 @@
 
 class Nest:
-    def __init__(self, x, y, id1, id2, ht):
+    def __init__(self, x, y, id, ht):
         self.x = x
         self.y = y
         self.parent_id = id
@@ -14,5 +14,5 @@ class Nest:
         lattice.spawn(self)
 
     def die(self):
-        del self
         lattice.nest_list(self, remove)
+        del self
