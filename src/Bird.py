@@ -6,14 +6,14 @@ import numpy as np
 class Bird(AgentSuper):
 
 
-     def __init__(self, x_nest = None, y_nest = None):
+    def __init__(self, x_nest = None, y_nest = None):
          super().__init__(self)
          #all_positions =
          self.is_in_nest = True
          self.has_nest = False
 
 
-     def place_nest(self,nest_list,all_positions):
+    def place_nest(self,nest_list,all_positions):
          available_positions = np.delete(all_positions,nest_list)
          pick_position = np.random.randit(0,len(available_positions)-1)
          nest_x = available_positions(pick_position, 1)
@@ -22,8 +22,8 @@ class Bird(AgentSuper):
 
          return nest_x,nest_y
 
-     def check_is_in_nest(self):
-         return self.is_in_nest
+    def check_is_in_nest(self):
+        return self.is_in_nest
 
     def __init__(self, x, y, grid_size):
         super().__init__(self, x, y)
