@@ -25,7 +25,12 @@ class Lattice:
         self.nest_list = []
         self.step_count = 0
         self.plot_matrix = np.zeros(self.shape)
-        self.fig, self.environment_ax, self.anim = self.init_plot()
+        self.fig, self.environment_ax = plt.subplots(1, 1)
+        self.anim = Animation.FuncAnimation(self.fig,
+                                       self.update_plot,
+                                       blit=False,
+                                        interval=500)
+
 
 
     def init_topology(self):
@@ -38,8 +43,10 @@ class Lattice:
 
 
     def run_simulation(self):
-        for i_step in range(self.n_steps):
-            self.step()
+        for i in range(int(1e3)):
+            self.plot_matrix = np.random.rand(*self.shape)
+        #for i_step in range(self.n_steps):
+         #   self.step()
 
     def init_agents(self):
         for i_bird in range(self.n_birds):
@@ -107,20 +114,16 @@ class Lattice:
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
 
-    def init_plot(self):
-        fig = plt.figure()  # create a figure
-        environment_ax = fig.add_subplot(111)  # get ax
-        self.rat_plot, = environment_ax.plot([], [], ls='', color='brown')
-        self.bird_plot, environment_ax.plot([], [], ls='', color='yellow')
-        self.nest_plot, environment_ax.plot([], [], ls='', color='green')
-        anim = Animation.FuncAnimation(environment_ax, self.update_plot())  # ????
-        return fig, environment_ax, anim
-
     def update_plot(self, i):
         # --- we probably want to use trisurf here! --- #
+        self.plot_matrix = np.random.rand(*self.shape)
         self.environment_ax.pcolor(self.plot_matrix)
-        pass
 
 
 if __name__ == '__main__':
-    lattice = Lattice(100, 10)
+    lattice_size = 100
+    n_birds = 10
+    n_rats = 10
+    lattice = Lattice(lattice_size, n_rats, n_birds)
+    plt.show()
+    #lattice.run_simulation()
