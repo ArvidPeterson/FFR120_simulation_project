@@ -117,11 +117,11 @@ class Lattice:
     def update_plot(self, i):
         # --- we probably want to use trisurf here! --- #
         self.plot_matrix = np.random.rand(*self.shape)
-        self.environment_ax.pcolor(self.plot_matrix)
+        self.environment_ax.pcolorfast(self.plot_matrix)
 
 
 if __name__ == '__main__':
-    lattice_size = 100
+    lattice_size = 1000
     n_birds = 10
     n_rats = 10
     lattice = Lattice(lattice_size, n_rats, n_birds)
