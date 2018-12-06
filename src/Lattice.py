@@ -1,11 +1,17 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
+import matplotlib.colors as clr
 from Bird import *
 from Rat import *
 
-
-
+def gen_colormap():
+    cdict = {'red': ((0,0,0), (1,0,0)),
+             'green': ((0,0,0),(0,1,0)),
+             'blue': ((0,0,0),(0,1,0)),
+             'brown': ((0,0,0),(210/255, 180/255, 140/255)),
+             'yellow': ((0,0,0), (0, 1, 1))}
+    return clr.LinearSegmentedColormap.from_list('main_color', cdict)
 
 # todo: visualize the random walk of the rats
 # todo: visualize the topological environment
@@ -25,6 +31,7 @@ class Lattice:
         self.nest_list = []
         self.step_count = 0
         self.plot_matrix = np.zeros(self.shape)
+        self.cmap = gen_colormap()
         self.fig, self.environment_ax = plt.subplots(1, 1)
         self.anim = Animation.FuncAnimation(self.fig,
                                        self.update_plot,
@@ -116,14 +123,17 @@ class Lattice:
 
     def update_plot(self, i):
         # --- we probably want to use trisurf here! --- #
-        self.plot_matrix = np.random.rand(*self.shape)
-        self.environment_ax.pcolorfast(self.plot_matrix)
+        self.plot_matrix = np.random.randint(0, 4, size=self.shape)
+        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=4, cmap=self.cmap)
 
 
 if __name__ == '__main__':
     lattice_size = 1000
     n_birds = 10
     n_rats = 10
-    lattice = Lattice(lattice_size, n_rats, n_birds)
+    #lattice = Lattice(lattice_size, n_rats, n_birds)
+    fig, ax = plt.subplots()
+    ax.pcolorfast(np.random.randint(0, 4, size=(3,3)), vmin=0, vmax=4,cmap=gen_colormap())
+
     plt.show()
     #lattice.run_simulation()
