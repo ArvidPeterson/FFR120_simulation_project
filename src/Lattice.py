@@ -84,7 +84,7 @@ class Lattice:
     def move_rats(self):
         for rat in self.rat_list:
             self.location_matrix[rat.x][rat.y].remove(rat)
-            x, y =  rat.move()
+            x, y = rat.move()
             self.location_matrix[x][y].append(rat)
 
 
