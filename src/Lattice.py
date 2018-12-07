@@ -48,16 +48,24 @@ class Lattice:
         self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
-        self.fig, self.environment_ax = plt.subplots(1, 1)
+        self.fig, self.environment_ax = plt.subplots()
+        self.init_topology()
+        self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
+        self.frames = [self.plot_matrix]
+        self.run_simulation()
+
+        # --- plot ---
+
         self.anim = Animation.FuncAnimation(self.fig,
-                                       self.update_plot,
-                                       blit=False,
-                                        interval=100)
-        self.rat_plot, = self.environment_ax.plot([], [])  # plot rats on this plot
+                                            self.update_plot,
+                                            frames=range(0, self.n_sim_steps),
+                                            blit=True,
+                                            interval=100)
+
+        # self.rat_plot, = self.environment_ax.plot([], [])  # plot rats on this plot
 
 
     def init_topology(self):
-        self.plot_matrix = np.zeros(self.shape)
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
@@ -65,39 +73,24 @@ class Lattice:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
-        # possible_topological_values =  np.linspace(1, self.maximum_peak_height, self.maximum_peak_height, dtype=int)
-        # island_topology = np.random.choice(possible_topological_values, size=island_bounds)
-
-
     def run_simulation(self):
-        self.init_topology()
         self.init_agents()
         for i_step in range(self.n_sim_steps):
             self.step(i_step)
             self.step_count = i_step
+            self.frames.append(np.copy(self.plot_matrix))
 
     def init_agents(self):
-        '''
-        for i_bird in range(self.n_birds):
-            x, y = self.gen_starting_pos()
-            bird = Bird(x, y)
-            nest = bird.place_nest()
-            self.bird_list.append(bird)
-            self.nest_list.append(nest)
-        '''
-
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
             rat = Rat(self.size, x_start, y_start, self.topological_map, self.rat_lifetime)
             self.location_matrix[x_start][y_start].append(rat)
             self.plot_matrix[x_start, y_start] = self.rat_color_index
-            print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
     def step(self, i_step):
         self.step_count += 1
         self.move_rats()
-        self.update_plot(1)
         #self.step_birds()
         #self.kill_birds_and_nests()
         #self.build_nests()
@@ -161,24 +154,12 @@ class Lattice:
                 self.nest_list.append(nest)
 
     def update_plot(self, i):
-        #self.plot_matrix = np..randint(0, 4, size=self.shape)
-        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
+        self.im.set_array(self.frames[i])
+        self.environment_ax.set_title('time_step: {}'.format(i))
+        return self.im,
 
-        '''
-        #plot with specific rat plot
-        rat_pos = np.zeros([2, self.n_rats]);
-        for i_rat in range(self.n_rats):
-            # store all rat positions to array and draw array
-            rat_pos[0, i_rat] = self.rat_list[i_rat].x
-            rat_pos[1, i_rat] = self.rat_list[i_rat].y
-        self.rat_plot.set_xdata(rat_pos[0, :])
-        self.rat_plot.set_ydata(rat_pos[1, :])
-        '''
-        self.environment_ax.set(title=('t = ' + str(self.step_count)))
 
-        plt.draw()
-        plt.pause(1e-17)
-        # end update plot
+
 
 if __name__ == '__main__':
     lattice_size = 200
@@ -186,5 +167,4 @@ if __name__ == '__main__':
     n_rats = 200
     n_sim_steps = int(1e3)
     lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
-    lattice.run_simulation()
     plt.show()
