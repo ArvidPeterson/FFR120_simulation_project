@@ -42,8 +42,6 @@ class Lattice:
                                         interval=500)
 
 
-    def init_topology(self):
-
 
     def init_topology(self):
         padding_percentage = .2
