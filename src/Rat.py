@@ -42,6 +42,8 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         if self.topological_map[self.x, self.y] < 1:
             [x, y] = self.move()
+            self.x = x
+            self.y = y
 
         return [self.x, self.y]
 
