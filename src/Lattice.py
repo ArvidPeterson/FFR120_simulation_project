@@ -62,9 +62,6 @@ class Lattice:
                                             blit=True,
                                             interval=100)
 
-        # self.rat_plot, = self.environment_ax.plot([], [])  # plot rats on this plot
-
-
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
@@ -88,11 +85,21 @@ class Lattice:
             self.plot_matrix[x_start, y_start] = self.rat_color_index
             self.rat_list.append(rat)
 
+        for i_bird in range(self.n_birds):
+            x_start, y_start = self.gen_starting_pos()
+            bird = Bird(self.size, x_start, y_start, self.topological_map)
+            self.location_matrix[x_start][y_start].append(bird)
+            self.plot_matrix[x_start, y_start] = self.bird_color_index
+            nest = bird.place_nest(self.nest_list)
+            self.nest_list.append(nest)
+            self.bird_list.append(bird)
+
     def step(self, i_step):
         self.step_count += 1
         self.move_rats()
-        #self.step_birds()
-        #self.kill_birds_and_nests()
+        self.move_birds()
+        self.kill_birds_and_nests()
+
         #self.build_nests()
         #self.hatch()
 
@@ -133,6 +140,11 @@ class Lattice:
     def move_birds(self):
         for bird in self.bird_list:
             bird.move()  # sets the bird in or out of nest
+            x, y = bird.x, bird.y
+            if bird.is_in_nest:
+                self.plot_matrix[x][y] = self.bird_color_index
+            else:
+                self.plot_matrix[x][y] = self.nest_color_index
 
     def kill_birds_and_nests(self):
         for i_nest, nest in enumerate(self.nest_list):
@@ -155,7 +167,7 @@ class Lattice:
 
     def update_plot(self, i):
         self.im.set_array(self.frames[i])
-        self.environment_ax.set_title('time_step: {}'.format(i))
+        self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
         return self.im,
 
 
@@ -163,7 +175,7 @@ class Lattice:
 
 if __name__ == '__main__':
     lattice_size = 200
-    n_birds = 10
+    n_birds = 100
     n_rats = 200
     n_sim_steps = int(1e3)
     lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
