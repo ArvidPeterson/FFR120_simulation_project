@@ -8,12 +8,13 @@ from AgentSuper import AgentSuper
 
 class Rat(AgentSuper):  # inherits AgentSuper
 
-    def __init__(self, grid_size, x_start, y_start, life_time):
+    def __init__(self, grid_size, x_start, y_start, life_time, topological_map):
         AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
+        self.topological_map = topological_map
 
     def move(self):
 
-        ''' Moves the rat one step in a random walk, vin Neuman neighbourhood '''
+        ''' Moves the rat one step in a random walk, von Neuman neighbourhood '''
 
         self.life_time += 1
 
@@ -38,6 +39,11 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         self.x = coord[0]
         self.y = coord[1]
+
+        if self.topological_map[self.x, self.y] < 1:
+            [x, y] = self.move()
+            self.x = x
+            self.y = y
 
         return [self.x, self.y]
 
