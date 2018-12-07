@@ -12,10 +12,14 @@ class Lattice:
         self.size = size
         self.shape = (size, size)
         self.topological_map = np.zeros(self.shape)
+        self.island_radius = .45 * self.size
+        self.island_center = .5 * self.size
         self.maximum_peak_height = 100
         self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
         self.n_birds = n_birds
         self.n_rats = n_rats
+        self.rat_lifetime = 100
+        self.bird_lifetime = 100
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -37,6 +41,8 @@ class Lattice:
                                        blit=False,
                                         interval=500)
 
+
+    def init_topology(self):
 
 
     def init_topology(self):
@@ -60,7 +66,7 @@ class Lattice:
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
-                if math.sqrt((x - island_center) ** 2 + (y - island_center) ** 2)  < island_radius:
+                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2)  < self.island_radius:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
@@ -76,16 +82,20 @@ class Lattice:
         #    self.step_count = i_step
 
     def init_agents(self):
+        '''
         for i_bird in range(self.n_birds):
             x, y = self.gen_starting_pos()
             bird = Bird(x, y)
             nest = bird.place_nest()
             self.bird_list.append(bird)
             self.nest_list.append(nest)
+        '''
 
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
-            rat = Rat(x, y, self.topological_map )
+            rat = Rat(x_start, y_start, self.topological_map, self.rat_lifetime)
+            self.plot_matrix[x_start, y_start] = self.rat_color_index
+            print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
 
@@ -109,7 +119,10 @@ class Lattice:
                 self.location_matrix[x][y].append(bird)
 
     def gen_starting_pos(self):
-        return np.random.randint(0, self.size, 2)
+        x, y = np.random.randint(0, self.size, 2)
+        while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
+            x, y = np.random.randint(0, self.size, 2)
+        return x, y
 
     def move_rats(self):
         for rat in self.rat_list:
@@ -161,7 +174,12 @@ class Lattice:
 
 
 if __name__ == '__main__':
-    lattice_size = 500
+    lattice_size = 200
     n_birds = 10
+    n_rats = 200
+    n_sim_steps = int(1e3)
+    lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
+    lattice.run_simulation()
+    plt.show()
     n_rats = 10
     lattice = Lattice(lattice_size, n_rats, n_birds)
