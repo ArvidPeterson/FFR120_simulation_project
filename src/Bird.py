@@ -27,8 +27,7 @@ class Bird(AgentSuper):
     def index_to_coordinate(self, index):
         x = index % self.grid_size
         y = int(np.floor(index/self.grid_size))
-        return (x, y)
-
+        return x, y
 
     def place_nest(self, nest_list):
         # Creates a temporary grid used to determine where nests can be created.

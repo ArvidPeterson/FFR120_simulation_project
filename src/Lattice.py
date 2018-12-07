@@ -53,6 +53,7 @@ class Lattice:
                                        self.update_plot,
                                        blit=False,
                                         interval=100)
+        self.rat_plot, = self.environment_ax.plot([], [])  # plot rats on this plot
 
 
     def init_topology(self):
@@ -96,6 +97,7 @@ class Lattice:
 
     def step(self, i_step):
         self.move_rats()
+        self.update_plot(1)
         #self.step_birds()
         #self.kill_birds_and_nests()
         #self.build_nests()
@@ -108,13 +110,14 @@ class Lattice:
                 x, y = nest.hatch()
                 # --- spawn a bird ! --- #
                 x, y = self.gen_starting_pos()
-                bird = Bird(x,y)
+                bird = Bird(x, y)
                 self.bird_list.append(bird)
                 self.location_matrix[x][y].append(bird)
 
     def gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
         while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
+            # generates new starting positions until one on land is generated
             x, y = np.random.randint(0, self.size, 2)
         return x, y
 
@@ -137,7 +140,7 @@ class Lattice:
 
     def move_birds(self):
         for bird in self.bird_list:
-            bird.step()
+            bird.move() # sets the bird in or out of nest
 
     def kill_birds_and_nests(self):
         for i_nest, nest in enumerate(self.nest_list):
@@ -162,6 +165,20 @@ class Lattice:
         #self.plot_matrix = np..randint(0, 4, size=self.shape)
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
 
+        '''
+        #plot with specific rat plot
+        rat_pos = np.zeros([2, self.n_rats]);
+        for i_rat in range(self.n_rats):
+            # store all rat positions to array and draw array
+            rat_pos[0, i_rat] = self.rat_list[i_rat].x
+            rat_pos[1, i_rat] = self.rat_list[i_rat].y
+        self.rat_plot.set_xdata(rat_pos[0, :])
+        self.rat_plot.set_ydata(rat_pos[1, :])
+        #self.environment_ax.set(title=('t = ' + str(i)))
+        '''
+        plt.draw()
+        plt.pause(1e-17)
+        # end update plot
 
 if __name__ == '__main__':
     lattice_size = 200
