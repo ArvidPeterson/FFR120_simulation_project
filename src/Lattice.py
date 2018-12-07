@@ -52,7 +52,7 @@ class Lattice:
         self.anim = Animation.FuncAnimation(self.fig,
                                        self.update_plot,
                                        blit=False,
-                                        interval=500)
+                                        interval=100)
 
 
     def init_topology(self):
@@ -71,9 +71,9 @@ class Lattice:
     def run_simulation(self):
         self.init_topology()
         self.init_agents()
-        #for i_step in range(self.n_sim_steps):
-        #    self.step(i_step)
-        #    self.step_count = i_step
+        for i_step in range(self.n_sim_steps):
+            self.step(i_step)
+            self.step_count = i_step
 
     def init_agents(self):
         '''
@@ -87,19 +87,20 @@ class Lattice:
 
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
-            rat = Rat(x_start, y_start, self.topological_map, self.rat_lifetime)
+            rat = Rat(self.size, x_start, y_start, self.topological_map, self.rat_lifetime)
+            self.location_matrix[x_start][y_start].append(rat)
             self.plot_matrix[x_start, y_start] = self.rat_color_index
             print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
 
-    def step(self):
-        self.step_rats()
+    def step(self, i_step):
+        self.move_rats()
         #self.step_birds()
         #self.kill_birds_and_nests()
         #self.build_nests()
         #self.hatch()
-        self.update_plot_matrix()
+
 
     def hatch(self):
         for nest in self.nest_list:
