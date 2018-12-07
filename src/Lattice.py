@@ -85,7 +85,7 @@ class Lattice:
 
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
-            rat = Rat(x, y, self.topological_map )
+            rat = Rat(x, y, self.topological_map)
             self.rat_list.append(rat)
 
 
