@@ -34,16 +34,18 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         coord = np.array([x, y])
 
-        coord[coord > self.grid_size] = 0  # if outside grid
-        coord[coord < 0] = self.grid_size
+        coord[coord >= self.grid_size] = 0  # if outside grid
+        coord[coord <= 0] = self.grid_size
+
+        while self.topological_map[coord[0], coord[1]] < 1:  # if in water
+            [x, y] = self.move()
+            coord[0] = x
+            coord[1] = y
 
         self.x = coord[0]
         self.y = coord[1]
 
-        if self.topological_map[self.x, self.y] < 1:  # if in water
-            [x, y] = self.move()
-            self.x = x
-            self.y = y
+
 
         return [self.x, self.y]
 
