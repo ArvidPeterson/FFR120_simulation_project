@@ -24,6 +24,8 @@ class Lattice:
         self.size = size
         self.shape = (size, size)
         self.topological_map = np.zeros(self.shape)
+        self.island_radius = .45 * self.size
+        self.island_center = .5 * self.size
         self.maximum_peak_height = 100
         self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
         self.step_count = 0
@@ -54,13 +56,11 @@ class Lattice:
 
 
     def init_topology(self):
-        island_radius = .45 * self.size
-        island_center = .5 * self.size
         self.plot_matrix = np.zeros(self.shape)
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
-                if math.sqrt((x - island_center) ** 2 + (y - island_center) ** 2)  < island_radius:
+                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2)  < self.island_radius:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
@@ -76,16 +76,18 @@ class Lattice:
         #    self.step_count = i_step
 
     def init_agents(self):
+        '''
         for i_bird in range(self.n_birds):
             x, y = self.gen_starting_pos()
             bird = Bird(x, y)
             nest = bird.place_nest()
             self.bird_list.append(bird)
             self.nest_list.append(nest)
+        '''
 
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
-            rat = Rat(x, y, self.topological_map)
+            rat = Rat(x_start, y_start, self.topological_map)
             self.rat_list.append(rat)
 
 
@@ -108,7 +110,10 @@ class Lattice:
                 self.location_matrix[x][y].append(bird)
 
     def gen_starting_pos(self):
-        return np.random.randint(0, self.size, 2)
+        x, y = np.random.randint(0, self.size, 2)
+        while math.sqrt((x - self.center) ** 2 + (y - self.center) ** 2) < self.radius:
+            x, y = np.random.randint(0, self.size, 2)
+        return x, y
 
     def move_rats(self):
         for rat in self.rat_list:
