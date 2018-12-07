@@ -94,15 +94,14 @@ class Lattice:
             print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
-
     def step(self, i_step):
+        self.step_count += 1
         self.move_rats()
         self.update_plot(1)
         #self.step_birds()
         #self.kill_birds_and_nests()
         #self.build_nests()
         #self.hatch()
-
 
     def hatch(self):
         for nest in self.nest_list:
@@ -134,13 +133,13 @@ class Lattice:
             else:
                 self.plot_matrix[x][y] = self.land_color_index
 
-            x, y =  rat.move()
+            x, y = rat.move()
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
     def move_birds(self):
         for bird in self.bird_list:
-            bird.move() # sets the bird in or out of nest
+            bird.move()  # sets the bird in or out of nest
 
     def kill_birds_and_nests(self):
         for i_nest, nest in enumerate(self.nest_list):
@@ -174,8 +173,9 @@ class Lattice:
             rat_pos[1, i_rat] = self.rat_list[i_rat].y
         self.rat_plot.set_xdata(rat_pos[0, :])
         self.rat_plot.set_ydata(rat_pos[1, :])
-        #self.environment_ax.set(title=('t = ' + str(i)))
         '''
+        self.environment_ax.set(title=('t = ' + str(self.step_count)))
+
         plt.draw()
         plt.pause(1e-17)
         # end update plot
