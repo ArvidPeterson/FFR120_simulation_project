@@ -5,11 +5,10 @@ import numpy as np
 
 
 class Bird(AgentSuper):
-    def __init__(self, grid_size, x, y, life_time = 1):
-         AgentSuper.__init__(self, grid_size, x, y, life_time)
-         #all_positions =
-         self.is_in_nest = True
-         self.has_nest = False
+    def __init__(self, grid_size, x, y, topological_map, life_time=1):
+        AgentSuper.__init__(self, grid_size, x, y, life_time, topological_map)
+        self.is_in_nest = True
+        self.has_nest = False
 
     def check_is_in_nest(self):
         return self.is_in_nest
@@ -49,11 +48,6 @@ class Bird(AgentSuper):
         # A new nest object is created
         new_nest = Nest(self.grid_size, x_new_nest, y_new_nest, some_life_time)
         return new_nest
-
-
-
-
-
 
     def is_rat(self, x):
         return isinstance(x, Rat)
