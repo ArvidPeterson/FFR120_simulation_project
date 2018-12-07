@@ -41,8 +41,12 @@ class Bird(AgentSuper):
         random_index = np.random.randint(0, available_indices.__len__())
         (x_new_nest, y_new_nest) = self.index_to_coordinate(available_indices[random_index])
 
+        while self.topological_map[x_new_nest, y_new_nest] < 1:
+            # if position is spawned in water in topological map, get new random position
+            (x_new_nest, y_new_nest) = self.index_to_coordinate(available_indices[random_index])
+
         # ==========================================================
-        some_life_time = 1 # THIS SHOULD BE SET TO THE PROPER VALUE
+        some_life_time = 1  # THIS SHOULD BE SET TO THE PROPER VALUE
         # ==========================================================
 
         # A new nest object is created
