@@ -132,8 +132,6 @@ class Lattice:
                 self.plot_matrix[x][y] = self.land_color_index
 
             x, y =  rat.move()
-            self.location_matrix[rat.x][rat.y].remove(rat)
-            x, y = rat.move()
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
