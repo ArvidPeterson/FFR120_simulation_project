@@ -112,6 +112,7 @@ class Lattice:
 
     def move_rats(self):
         for rat in self.rat_list:
+<<<<<<< HEAD
             x, y = rat.x, rat.y
             self.location_matrix[x][y].remove(rat)
 
@@ -124,6 +125,10 @@ class Lattice:
                 self.plot_matrix[x][y] = self.land_color_index
 
             x, y =  rat.move()
+=======
+            self.location_matrix[rat.x][rat.y].remove(rat)
+            x, y = rat.move()
+>>>>>>> 1596a93488051cbd9475a71d0cb2eb827ce16804
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
