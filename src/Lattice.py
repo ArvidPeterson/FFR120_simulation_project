@@ -78,8 +78,8 @@ class Lattice:
     def init_agents(self):
         for i_bird in range(self.n_birds):
             x, y = self.gen_starting_pos()
-            #bird = Bird(x, y)
-            #nest = bird.place_nest()
+            bird = Bird(x, y)
+            nest = bird.place_nest()
             self.bird_list.append(bird)
             self.nest_list.append(nest)
 
