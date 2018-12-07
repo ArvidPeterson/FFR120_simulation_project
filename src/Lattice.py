@@ -23,7 +23,7 @@ class Lattice:
         # --- environment and general sim variables --- #
         self.size = size
         self.shape = (size, size)
-        self.topological_matrix = np.zeros(self.shape)
+        self.topological_map = np.zeros(self.shape)
         self.maximum_peak_height = 100
         self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
         self.step_count = 0
@@ -37,6 +37,11 @@ class Lattice:
         self.nest_list = []
 
         # --- plotting variables --- #
+        self.water_color_index = 0
+        self.land_color_index = 1
+        self.rat_color_index = 2
+        self.bird_color_index = 3
+        self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
         self.fig, self.environment_ax = plt.subplots(1, 1)
@@ -49,15 +54,15 @@ class Lattice:
 
 
     def init_topology(self):
-        island_radius = .4 * self.size
+        island_radius = .45 * self.size
         island_center = .5 * self.size
         self.plot_matrix = np.zeros(self.shape)
-        self.topological_matrix = np.zeros(self.shape)
+        self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
                 if math.sqrt((x - island_center) ** 2 + (y - island_center) ** 2)  < island_radius:
-                    self.plot_matrix[x, y] = 1
-                    self.topological_matrix[x, y] = 1
+                    self.plot_matrix[x, y] = self.land_color_index
+                    self.topological_map[x, y] = 1
 
         # possible_topological_values =  np.linspace(1, self.maximum_peak_height, self.maximum_peak_height, dtype=int)
         # island_topology = np.random.choice(possible_topological_values, size=island_bounds)
@@ -65,6 +70,7 @@ class Lattice:
 
     def run_simulation(self):
         self.init_topology()
+        self.init_agents()
         #for i_step in range(self.n_sim_steps):
         #    self.step(i_step)
         #    self.step_count = i_step
@@ -72,14 +78,14 @@ class Lattice:
     def init_agents(self):
         for i_bird in range(self.n_birds):
             x, y = self.gen_starting_pos()
-            bird = Bird(x, y)
-            nest = bird.place_nest()
+            #bird = Bird(x, y)
+            #nest = bird.place_nest()
             self.bird_list.append(bird)
             self.nest_list.append(nest)
 
         for i_rat in range(self.n_rats):
-            x, y = self.gen_starting_pos()
-            rat = Rat()
+            x_start, y_start = self.gen_starting_pos()
+            rat = Rat(x, y, self.topological_map )
             self.rat_list.append(rat)
 
 
@@ -106,10 +112,20 @@ class Lattice:
 
     def move_rats(self):
         for rat in self.rat_list:
-            self.location_matrix[rat.x][rat.y].remove(rat)
+            x, y = rat.x, rat.y
+            self.location_matrix[x][y].remove(rat)
+
+            # if there are no rats left on the old location
+            # color the location green!
+            for agent in self.location_matrix[x][y]:
+                if isinstance(agent, Rat):
+                    break
+            else:
+                self.plot_matrix[x][y] = self.land_color_index
+
             x, y =  rat.move()
             self.location_matrix[x][y].append(rat)
-
+            self.plot_matrix[x][y] = self.rat_color_index
 
     def move_birds(self):
         for bird in self.bird_list:
@@ -134,26 +150,13 @@ class Lattice:
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
 
-    def update_plot_matrix(self):
-        for rat in self.rat_list:
-            x, y = rat.x, rat.y
-            self.plot_matrix[x, y] = 2
-
-        for bird in self.bird_list:
-            x, y = bird.x, bird.y
-            self.plot_matrix[x, y] = 3
-
-        for nest in self.nest_list:
-            x, y = nest.x, nest.y
-            self.plot_matrix[x, y]= 4
-
     def update_plot(self, i):
         #self.plot_matrix = np..randint(0, 4, size=self.shape)
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
 
 
 if __name__ == '__main__':
-    lattice_size = 1000
+    lattice_size = 500
     n_birds = 10
     n_rats = 10
     n_sim_steps = int(1e3)
