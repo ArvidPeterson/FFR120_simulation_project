@@ -1,8 +1,19 @@
 
 from Bird import Bird
 from Nest import Nest
+from Rat import Rat
 
 gridSize = 3
+
+
+rat = Rat(x_start=0, y_start=0, grid_size=gridSize, life_time=1e3)
+
+for ii in range(int(1e3)):
+    rat.move()
+    if rat.x > gridSize or rat.y > gridSize:
+        print('OUT')
+    elif rat.x < 0 or rat.y < 0:
+        print('OUT')
 
 bird = Bird(gridSize, 4, 2)
 
