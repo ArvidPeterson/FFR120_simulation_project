@@ -9,26 +9,35 @@ from AgentSuper import AgentSuper
 class Rat(AgentSuper):  # inherits AgentSuper
 
     def __init__(self, grid_size, x_start, y_start, life_time):
-        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)  # calls AgentSuper.__init-- as well
+        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
 
     def move(self):
 
-        direction = np.random.randi(4)
+        ''' Moves the rat one step in a random walk, vin Neuman neighbourhood '''
+
+        self.life_time += 1
+
+        x = self.x
+        y = self.y
+
+        direction = np.random.randint(0, 4)
 
         if direction == 0:  # go right
-            self.x += 1
+            x += 1
         elif direction == 1:  # go left
-            self.x -= 1
+            x -= 1
         elif direction == 2:  # go up
-            self.y += 1
+            y += 1
         elif direction == 3:  # go down
-            self.y -= 1
+            y -= 1
 
-        for coordinate in [self.x, self.y]:
-            if coordinate > self.grid_size:
-                coordinate = 0
-            elif coordinate < 0:
-                coordinate = self.grid_size
+        coord = np.array([x, y])
+
+        coord[coord > self.grid_size] = 0
+        coord[coord < 0] = self.grid_size
+
+        self.x = coord[0]
+        self.y = coord[1]
 
         return [self.x, self.y]
 
