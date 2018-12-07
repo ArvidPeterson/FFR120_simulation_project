@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
+from threading import Thread
 from Bird import *
 from Rat import *
 
@@ -14,12 +15,12 @@ from Rat import *
 # birds -> yellow -> 4
 # nests -> black -> 5
 
-class Lattice:
+class Lattice(Thread):
 
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps, *,
                  plot_environment=True, plot_populations=False):
-
+        Thread.__init__(self)
         # --- environment and general sim variables --- #
         self.size = size
         self.shape = (size, size)
@@ -52,7 +53,7 @@ class Lattice:
         self.init_topology()
         self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
-        self.run_simulation()
+        #self.run_simulation()
 
         # --- plot ---
 
@@ -70,7 +71,7 @@ class Lattice:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
-    def run_simulation(self):
+    def run(self):
         self.init_agents()
         for i_step in range(self.n_sim_steps):
             self.step(i_step)
@@ -153,11 +154,13 @@ class Lattice:
             if any(filter(lambda x: isinstance(x, Rat), self.location_matrix[x][y])):
                 for item in self.location_matrix[x][y]:
                     # --- remove all the birds on the site --- #
-                    if isinstance(item, Bird):
+                    if item.__class__.__name__ == 'Bird':
+                        print('ineer')
                         self.bird_list.remove(item)
 
                 # --- finish by removing the nest --- #
                 self.nest_list.remove(nest)
+                #print('nest_list_len: {}'.format(len(self.nest_list)))
 
     def build_nests(self):
         for bird in self.bird_list:
@@ -166,8 +169,11 @@ class Lattice:
                 self.nest_list.append(nest)
 
     def update_plot(self, i):
-        self.im.set_array(self.frames[i])
-        self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
+        try:
+            self.im.set_array(self.frames[i])
+            self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
+        except:
+            pass
         return self.im,
 
 
@@ -176,7 +182,9 @@ class Lattice:
 if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
-    n_rats = 200
-    n_sim_steps = int(1e3)
-    lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
+    n_rats = 1000
+    n_sim_steps = int(1e4)
+    sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
+    sim.start()
+    print('showing')
     plt.show()
