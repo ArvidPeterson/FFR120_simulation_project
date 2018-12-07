@@ -34,6 +34,8 @@ class Lattice:
         # --- agent variables --- #
         self.n_birds = n_birds
         self.n_rats = n_rats
+        self.rat_lifetime = 100
+        self.bird_lifetime = 100
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -51,8 +53,6 @@ class Lattice:
                                        self.update_plot,
                                        blit=False,
                                         interval=500)
-
-
 
 
     def init_topology(self):
@@ -87,7 +87,9 @@ class Lattice:
 
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
-            rat = Rat(x_start, y_start, self.topological_map)
+            rat = Rat(x_start, y_start, self.topological_map, self.rat_lifetime)
+            self.plot_matrix[x_start, y_start] = self.rat_color_index
+            print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
 
@@ -111,7 +113,7 @@ class Lattice:
 
     def gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
-        while math.sqrt((x - self.center) ** 2 + (y - self.center) ** 2) < self.radius:
+        while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
             x, y = np.random.randint(0, self.size, 2)
         return x, y
 
@@ -163,9 +165,9 @@ class Lattice:
 
 
 if __name__ == '__main__':
-    lattice_size = 500
+    lattice_size = 200
     n_birds = 10
-    n_rats = 10
+    n_rats = 200
     n_sim_steps = int(1e3)
     lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     lattice.run_simulation()
