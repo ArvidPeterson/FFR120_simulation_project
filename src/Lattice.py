@@ -8,75 +8,22 @@ from Rat import *
 
 class Lattice:
 
-
-    def __init__(self, size, n_rats, n_birds):
-        self.size = size
-        self.shape = (size, size)
-        self.topological_map = np.zeros(self.shape)
-        self.island_radius = .45 * self.size
-        self.island_center = .5 * self.size
-        self.maximum_peak_height = 100
-        self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
-        self.n_birds = n_birds
-        self.n_rats = n_rats
-        self.rat_lifetime = 100
-        self.bird_lifetime = 100
-        self.bird_list = []
-        self.rat_list = []
-        self.nest_list = []
-        self.step_count = 0
-
-
-        # --- plotting variables --- #
-        self.water_color_index = 0
-        self.land_color_index = 1
-        self.rat_color_index = 2
-        self.bird_color_index = 3
-        self.nest_color_index = 4
-
-        self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
-        self.fig, self.environment_ax = plt.subplots(1, 1)
-        self.anim = Animation.FuncAnimation(self.fig,
-                                       self.update_plot,
-                                       blit=False,
-                                        interval=500)
-
-
-
     def init_topology(self):
-        padding_percentage = .2
-        island_bounds = (padding_percentage, self.size - padding_percentage)
-        possible_topological_values =  np.linspace(1, self.maximum_peak_height, self.maximum_peak_height, dtype=int)
-        island_topology = np.random.choice(possible_topological_values, size=island_bounds)
-        # todo: fix the topological implementation
-        # save this implementation for later versions though!
-
-
-    def run_simulation(self):
-        for i in range(int(1e3)):
-            self.plot_matrix = np.random.rand(*self.shape)
-        #for i_step in range(self.n_steps):
-         #   self.step()
-
-        island_radius = .45 * self.size
-        island_center = .5 * self.size
         self.plot_matrix = np.zeros(self.shape)
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
-                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2)  < self.island_radius:
+                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) < self.island_radius:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
         # possible_topological_values =  np.linspace(1, self.maximum_peak_height, self.maximum_peak_height, dtype=int)
         # island_topology = np.random.choice(possible_topological_values, size=island_bounds)
 
-
     def run_simulation(self):
         self.init_topology()
         self.init_agents()
-        #for i_step in range(self.n_sim_steps):
+        # for i_step in range(self.n_sim_steps):
         #    self.step(i_step)
         #    self.step_count = i_step
 
@@ -97,15 +44,13 @@ class Lattice:
             print('finished initializing rat {}'.format(i_rat))
             self.rat_list.append(rat)
 
-
     def step(self):
         self.step_rats()
-        #self.step_birds()
-        #self.kill_birds_and_nests()
-        #self.build_nests()
-        #self.hatch()
-        self.update_plot_matrix
-        self.step_count += 1
+        # self.step_birds()
+        # self.kill_birds_and_nests()
+        # self.build_nests()
+        # self.hatch()
+        self.update_plot_matrix()
 
     def hatch(self):
         for nest in self.nest_list:
@@ -113,7 +58,7 @@ class Lattice:
                 x, y = nest.hatch()
                 # --- spawn a bird ! --- #
                 x, y = self.gen_starting_pos()
-                bird = Bird(x,y)
+                bird = Bird(x, y)
                 self.bird_list.append(bird)
                 self.location_matrix[x][y].append(bird)
 
@@ -136,8 +81,7 @@ class Lattice:
             else:
                 self.plot_matrix[x][y] = self.land_color_index
 
-            x, y =  rat.move()
-
+            x, y = rat.move()
             self.location_matrix[rat.x][rat.y].remove(rat)
             x, y = rat.move()
             self.location_matrix[x][y].append(rat)
@@ -167,9 +111,8 @@ class Lattice:
                 self.nest_list.append(nest)
 
     def update_plot(self, i):
-        # --- we probably want to use trisurf here! --- #
-        self.plot_matrix = np.random.randint(0, 4, size=self.shape)
-        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=4, cmap=self.cmap)
+        # self.plot_matrix = np..randint(0, 4, size=self.shape)
+        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
 
 
 if __name__ == '__main__':
@@ -180,5 +123,4 @@ if __name__ == '__main__':
     lattice = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     lattice.run_simulation()
     plt.show()
-    n_rats = 10
-    lattice = Lattice(lattice_size, n_rats, n_birds)
+
