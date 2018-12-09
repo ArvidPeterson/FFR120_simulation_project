@@ -7,14 +7,6 @@ from threading import Thread
 from Bird import *
 from Rat import *
 
-
-# plotting:
-# water -> blue -> 0
-# land -> green -> 1
-# rats -> brown -> 3
-# birds -> yellow -> 4
-# nests -> black -> 5
-
 class Lattice(Thread):
 
 
@@ -52,7 +44,9 @@ class Lattice(Thread):
         self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
-        self.fig, self.environment_ax = plt.subplots()
+        self.fig = plt.figure()
+        self.environment_ax = self.fig.add_subplot(121)
+        #self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
         self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
@@ -165,27 +159,42 @@ class Lattice(Thread):
     def kill_birds_and_nests(self):
         for i_nest, nest in enumerate(self.nest_list):
             x, y = nest.x, nest.y
-            # --- check if there is a rat at the nest site --- #
-            if any(filter(lambda x: isinstance(x, Rat), self.location_matrix[x][y])):
-                for item in self.location_matrix[x][y]:
 
-                    # --- remove all the birds on the site --- #
-                    if item.__class__.__name__ == 'Bird':
-                        # todo: this does not take into account
-                        # if bird.is_in_nest is true!
-                        print('ineer')
-                        self.bird_list.remove(item)
+            # --- list all agents on the site with the nest --- #
+            bird_list = []
+            rat_list = []
+            for agent_on_site in self.location_matrix[x][y]:
+                if isinstance(agent_on_site, Rat):
+                    rat_list.append(agent_on_site)
+                if isinstance(agent_on_site, Bird):
+                    bird_list.append(agent_on_site)
 
-                # --- finish by removing the nest --- #
-                nest.parent.has_nest = False
-                self.nest_list.remove(nest)
+            # if there's a rat on the current site
+            if rat_list:
+                    for bird in bird_list:
+                        if bird.is_in_nest:
+                            self.bird_list.remove(bird)
+                            self.nest_list.remove(nest)
+                        else:
+                            bird.has_nest = False
+                            self.nest_list.remove(nest)
+                        self.location_matrix[x][y].remove(bird)
+                        try:
+                            self.location_matrix[x][y].remove(nest)
+                        except ValueError:
+                            print('value_error')
+
+
+
 
 
     def build_nests(self):
         for bird in self.bird_list:
             if not bird.has_nest:
+                x, y = bird.x, bird.y
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
+                self.location_matrix[x][y].append(nest)
 
 
     def update_plot(self, i):
@@ -208,7 +217,7 @@ class Lattice(Thread):
 if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
-    n_rats = 100
+    n_rats = 10000
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
