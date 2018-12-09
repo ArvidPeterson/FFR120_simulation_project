@@ -78,6 +78,7 @@ class Lattice(Thread):
             self.step_count = i_step
             self.frames.append(np.copy(self.plot_matrix))
 
+
     def init_agents(self):
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
@@ -100,8 +101,7 @@ class Lattice(Thread):
         self.move_rats()
         self.move_birds()
         self.kill_birds_and_nests()
-
-        #self.build_nests()
+        self.build_nests()
         #self.hatch()
 
     def hatch(self):
@@ -167,13 +167,11 @@ class Lattice(Thread):
             if not bird.has_nest:
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
+                print('placed nest! {}'.format(self.step_count))
 
     def update_plot(self, i):
-        try:
-            self.im.set_array(self.frames[i])
-            self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
-        except:
-            pass
+        self.im.set_array(self.frames[-1])
+        self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
         return self.im,
 
 
