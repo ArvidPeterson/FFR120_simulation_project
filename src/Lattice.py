@@ -40,6 +40,9 @@ class Lattice(Thread):
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
+        self.bird_population_record = []
+        self.rat_population_record = []
+        self.nest_population_record = []
 
         # --- plotting variables --- #
         self.water_color_index = 0
@@ -74,12 +77,27 @@ class Lattice(Thread):
     def run(self):
         self.init_agents()
         for i_step in range(self.n_sim_steps):
+            # --- perform current simulation step --- #
             self.step(i_step)
             self.step_count = i_step
-            self.frames.append(np.copy(self.plot_matrix))
 
+            # --- save data so that it can be visualized async --- #
+            self.frames.append(np.copy(self.plot_matrix))
+            self.bird_population_record.append(len(self.bird_list))
+            self.rat_population_record.append(len(self.rat_list))
+            self.nest_population_record.append(len(self.nest_list))
+
+    def step(self, i_step):
+        self.step_count += 1
+        self.move_rats()
+        self.move_birds()
+        self.kill_birds_and_nests()
+        self.build_nests()
+        self.hatch()
 
     def init_agents(self):
+
+        # --- init rats --- #
         for i_rat in range(self.n_rats):
             x_start, y_start = self.gen_starting_pos()
             rat = Rat(self.size, x_start, y_start, self.topological_map, self.rat_lifetime)
@@ -87,6 +105,7 @@ class Lattice(Thread):
             self.plot_matrix[x_start, y_start] = self.rat_color_index
             self.rat_list.append(rat)
 
+        # --- init birds and nests --- #
         for i_bird in range(self.n_birds):
             x_start, y_start = self.gen_starting_pos()
             bird = Bird(self.size, x_start, y_start, self.topological_map)
@@ -96,13 +115,7 @@ class Lattice(Thread):
             self.nest_list.append(nest)
             self.bird_list.append(bird)
 
-    def step(self, i_step):
-        self.step_count += 1
-        self.move_rats()
-        self.move_birds()
-        self.kill_birds_and_nests()
-        self.build_nests()
-        #self.hatch()
+
 
     def hatch(self):
         for nest in self.nest_list:
@@ -114,11 +127,13 @@ class Lattice(Thread):
                 self.bird_list.append(bird)
                 self.location_matrix[x][y].append(bird)
 
+    # -- for generating independent starting positions --- #
     def gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
         while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
             # generates new starting positions until one on land is generated
             x, y = np.random.randint(0, self.size, 2)
+            # todo: make sure that agents don't spawn in the same location?
         return x, y
 
     def move_rats(self):
@@ -153,25 +168,38 @@ class Lattice(Thread):
             # --- check if there is a rat at the nest site --- #
             if any(filter(lambda x: isinstance(x, Rat), self.location_matrix[x][y])):
                 for item in self.location_matrix[x][y]:
+
                     # --- remove all the birds on the site --- #
                     if item.__class__.__name__ == 'Bird':
+                        # todo: this does not take into account
+                        # if bird.is_in_nest is true!
                         print('ineer')
                         self.bird_list.remove(item)
 
                 # --- finish by removing the nest --- #
+                nest.parent.has_nest = False
                 self.nest_list.remove(nest)
-                #print('nest_list_len: {}'.format(len(self.nest_list)))
+
 
     def build_nests(self):
         for bird in self.bird_list:
             if not bird.has_nest:
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
-                print('placed nest! {}'.format(self.step_count))
+
 
     def update_plot(self, i):
-        self.im.set_array(self.frames[-1])
-        self.environment_ax.set_title('time_step: {}, n_birds:{}'.format(i, len(self.bird_list)))
+        try:
+            i = len(self.frames) - 1
+            self.im.set_array(self.frames[i])
+            n_birds = self.bird_population_record[i]
+            n_rats = self.rat_population_record[i]
+            n_nests = self.nest_population_record[i]
+            self.environment_ax.set_title('time_step: {}, n_birds:{}, n_rats: {}, n_nests: {}'.format(
+                i, n_birds, n_rats, n_nests
+            ))
+        except:
+            pass
         return self.im,
 
 
@@ -180,9 +208,8 @@ class Lattice(Thread):
 if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
-    n_rats = 1000
+    n_rats = 100
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
-    print('showing')
     plt.show()

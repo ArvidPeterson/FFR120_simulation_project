@@ -49,8 +49,15 @@ class Bird(AgentSuper):
         some_life_time = 1  # THIS SHOULD BE SET TO THE PROPER VALUE
         # ==========================================================
 
-        # A new nest object is created
-        new_nest = Nest(self.grid_size, x_new_nest, y_new_nest, some_life_time)
+        # todo: might want to make nests have a different life time?
+
+        # --- place the new nest --- #
+        new_nest = Nest(self.grid_size, x_new_nest, y_new_nest, self.topological_map, self.life_time, self)
+
+        # --- move to the new nest --- #
+        self.x = x_new_nest
+        self.y = y_new_nest
+        self.has_nest = True
         return new_nest
 
     def is_rat(self, x):
