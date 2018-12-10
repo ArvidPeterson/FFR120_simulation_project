@@ -182,7 +182,7 @@ class Lattice(Thread):
             print(str)
 
     def kill_birds_and_nests(self):
-        rats_with_vision = True
+        rats_with_vision = True  # temporary ugly solution
         if rats_with_vision:
             self.range_vision_kill_function()
         else:
@@ -196,8 +196,6 @@ class Lattice(Thread):
                 for agent_on_site in self.location_matrix[x][y]:
                     if isinstance(agent_on_site, Rat):
                         rat_list.append(agent_on_site)
-                        #tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
-                        #bird_list += tmp_bird_list
                     if isinstance(agent_on_site, Bird):
                         bird_list.append(agent_on_site)
 
@@ -251,7 +249,7 @@ class Lattice(Thread):
 
 
     def update_plot(self, i):
-        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap= self.cmap)
+        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
         self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
