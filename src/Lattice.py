@@ -106,18 +106,17 @@ class Lattice(Thread):
             self.rat_list.append(rat)
 
         for i_bird in range(self.n_birds):
-            x, y = self.gen_starting_pos()
-            self.spawn_bird_and_nest(x, y)
+            self.spawn_bird_and_nest()
 
     def age_and_hatch_nests(self):
         for nest in self.nest_list:
             nest.tick()
             if nest.counter > nest.hatch_time:
                 nest.hatch()
-                x, y = self.gen_starting_pos()
-                self.spawn_bird_and_nest(x, y)
+                self.spawn_bird_and_nest()
                 
-    def spawn_bird_and_nest(self, x, y):
+    def spawn_bird_and_nest(self):
+        x, y = self.gen_unique_starting_pos()
         bird = Bird(self.size, x, y, self.topological_map, self.bird_lifetime)
         nest = Nest(self.size, x, y, self.topological_map, self.hatch_time, bird)
         bird.has_nest = True
@@ -130,22 +129,29 @@ class Lattice(Thread):
         # --- make it beautiful! --- #
         self.plot_matrix[x, y] = self.bird_color_index
 
-    def alt_gen_starting_pos(self):
-        x, y = np.random.randint(0, self.size, 2)
-        # check that the coordinates are within island bounds
-        count = 0
-        while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
-            # check that current site is empty
-            while not self.location_matrix[x][y]:
-                if count > int(1e4):
-                    raise TimeoutError("stuck in the while loop!")
-                x, y = np.random.randint(0, self.size, 2)
-                count += 1
+    def gen_starting_pos(self):
+        # generate a random x within island bounds
+        x = np.random.randint((self.island_center - self.island_radius), (self.island_center + self.island_radius))
+
+        # use trig to find y within island bounds as well!
+        x_rel_to_circle = abs(self.island_center - x)
+        y_rel_to_circle = math.sqrt(self.island_radius ** 2 - x_rel_to_circle ** 2)
+        ymax = max((self.island_center + y_rel_to_circle), (self.island_center - y_rel_to_circle))
+        ymin = min((self.island_center + y_rel_to_circle), (self.island_center - y_rel_to_circle))
+
+        # if we're in the outskirts of the island
+        if ymax == ymin:
+            y = int(ymax) - 1 # todo: make sure that they're not placed on perimiter
+        else:
+            y = np.random.randint(ymin, ymax)
+
         return x, y
 
     def gen_unique_starting_pos(self):
-        x = np.random.randint((self.island_center - self.island_radius), (self.island_center + self.island_radius))
-        cosx = (x - self.island_center) / self.island_radius
+        x, y = self.gen_starting_pos()
+        while not self.location_matrix[x][y]:
+            x, y = self.gen_starting_pos()
+        return x, y
 
 
     def move_and_age_rats(self):
@@ -275,7 +281,7 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     lattice_size = 200
-    n_birds = 100
+    n_birds = 400
     n_rats = 1000
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
