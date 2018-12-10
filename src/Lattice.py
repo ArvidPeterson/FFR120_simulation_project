@@ -1,3 +1,4 @@
+import logging
 import math
 import numpy as np
 import matplotlib.pyplot as plt
@@ -57,7 +58,7 @@ class Lattice(Thread):
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
                                             frames=range(0, self.n_sim_steps),
-                                            blit=True,
+                                            blit=False,
                                             interval=100)
 
     def init_topology(self):
@@ -125,9 +126,8 @@ class Lattice(Thread):
     def gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
         while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
-            # generates new starting positions until one on land is generated
-            x, y = np.random.randint(0, self.size, 2)
-            # todo: make sure that agents don't spawn in the same location?
+            while not self.location_matrix[x][y]: # make sure site is empy
+                x, y = np.random.randint(0, self.size, 2)
         return x, y
 
     def move_rats(self):
@@ -182,11 +182,7 @@ class Lattice(Thread):
                         try:
                             self.location_matrix[x][y].remove(nest)
                         except ValueError:
-                            print('value_error')
-
-
-
-
+                            logging.exception("something wrong with the nest removal")
 
     def build_nests(self):
         for bird in self.bird_list:
@@ -208,7 +204,7 @@ class Lattice(Thread):
                 i, n_birds, n_rats, n_nests
             ))
         except:
-            pass
+            pass # todo: this should not be implemented in this tacky way!
         return self.im,
 
 
@@ -217,7 +213,7 @@ class Lattice(Thread):
 if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
-    n_rats = 10000
+    n_rats = 1000
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
