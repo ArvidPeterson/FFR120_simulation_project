@@ -54,10 +54,12 @@ class Lattice(Thread):
         self.init_topology()
         self.frames = [self.plot_matrix]
         self.population_dynamics_ax = self.fig.add_subplot(122)
+        self.population_dynamics_ax.set_ylim(0, 1000)
+
         # create plots for population dynamics
-        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
-        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
-        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', ls='-', label='Rat population')
+        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', ls='-',label='Bird population')
+        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', ls='-',label='Nest population')
         plt.legend()
         plt.grid = True
 
@@ -172,7 +174,7 @@ class Lattice(Thread):
             if bird.age > bird.life_time:
                 self.kill_agent(bird)
 
-    def kill_agent(self, agent):
+    def kill_agent(self, agent):  # used primarely when agents die from age
         x, y = agent.x, agent.y
 
         if isinstance(agent, Rat):
@@ -181,7 +183,7 @@ class Lattice(Thread):
         if isinstance(agent, Bird):
             self.bird_list.remove(agent)  # remove the bird
             if agent.has_nest:  # also remove nest which otherwise is left dangling
-                self.nest_list.remove(agent.nest)
+                self.nest_list.remove(agent.nest)  # TODO: error is here. FIX!
                 self.location_matrix[x][y].remove(agent.nest)
         try:
             self.location_matrix[x][y].remove(agent)
@@ -277,6 +279,9 @@ class Lattice(Thread):
 
         self.nest_popu_plot.set_xdata(self.time_record)
         self.nest_popu_plot.set_ydata(self.nest_population_record)
+
+        tmp_m = max(self.time_record + [10])
+        self.population_dynamics_ax.set_xlim(0, tmp_m)
 
         plt.draw()  # lend resources to redraw
         plt.pause(1e-17)
