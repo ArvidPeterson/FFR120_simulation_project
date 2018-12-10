@@ -12,9 +12,9 @@ class Rat(AgentSuper):  # inherits AgentSuper
         AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
         self.last_direction_idx = 0
 
-    def move(self):
+    ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
 
-        ''' Moves the rat one step in a random walk, von Neuman neighbourhood '''
+    def move(self):
 
         self.life_time += 1
 
@@ -51,8 +51,6 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         self.x = coord[0]
         self.y = coord[1]
-
-
 
         return [self.x, self.y]
 
