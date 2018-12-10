@@ -1,6 +1,8 @@
 import logging
 import math
 import numpy as np
+import matplotlib
+matplotlib.use('qt4agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
@@ -51,14 +53,13 @@ class Lattice(Thread):
         self.init_topology()
         self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
-        #self.run_simulation()
 
         # --- plot ---
 
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
                                             frames=range(0, self.n_sim_steps),
-                                            blit=False,
+                                            blit=True,
                                             interval=100)
 
     def init_topology(self):
@@ -194,6 +195,7 @@ class Lattice(Thread):
 
 
     def update_plot(self, i):
+        """
         try:
             i = len(self.frames) - 1
             self.im.set_array(self.frames[i])
@@ -205,6 +207,7 @@ class Lattice(Thread):
             ))
         except:
             pass # todo: this should not be implemented in this tacky way!
+        """
         return self.im,
 
 
