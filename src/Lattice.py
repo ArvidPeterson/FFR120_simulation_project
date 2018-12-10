@@ -2,7 +2,7 @@ import logging
 import math
 import numpy as np
 import matplotlib
-matplotlib.use('qt4agg')
+matplotlib.use('qt5agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
@@ -38,6 +38,7 @@ class Lattice(Thread):
         self.bird_population_record = []
         self.rat_population_record = []
         self.nest_population_record = []
+        self.time_record = []
 
         # --- plotting variables --- #
         self.water_color_index = 0
@@ -49,9 +50,9 @@ class Lattice(Thread):
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
-        #self.population_dynamics_ax = self.fig.add_subplot(122)
+        self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
-        self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
+        #self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
 
         # --- plot ---
@@ -59,8 +60,8 @@ class Lattice(Thread):
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
                                             frames=range(0, self.n_sim_steps),
-                                            blit=True,
-                                            interval=100)
+                                            blit=False,
+                                            interval=50)
 
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)
@@ -82,6 +83,7 @@ class Lattice(Thread):
             self.bird_population_record.append(len(self.bird_list))
             self.rat_population_record.append(len(self.rat_list))
             self.nest_population_record.append(len(self.nest_list))
+            self.time_record.append(i_step)
 
     def step(self, i_step):
         self.step_count += 1
@@ -195,22 +197,11 @@ class Lattice(Thread):
 
 
     def update_plot(self, i):
-        """
-        try:
-            i = len(self.frames) - 1
-            self.im.set_array(self.frames[i])
-            n_birds = self.bird_population_record[i]
-            n_rats = self.rat_population_record[i]
-            n_nests = self.nest_population_record[i]
-            self.environment_ax.set_title('time_step: {}, n_birds:{}, n_rats: {}, n_nests: {}'.format(
-                i, n_birds, n_rats, n_nests
-            ))
-        except:
-            pass # todo: this should not be implemented in this tacky way!
-        """
-        return self.im,
-
-
+        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap= self.cmap)
+        self.environment_ax.set_title("time: {}".format(self.step_count))
+        self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
+        self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
+        self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
 
 
 if __name__ == '__main__':
