@@ -51,9 +51,14 @@ class Lattice(Thread):
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
-        self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
         self.frames = [self.plot_matrix]
+        self.population_dynamics_ax = self.fig.add_subplot(122)
+        # create plots for population dynamics
+        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
+        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
+        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        plt.grid = True
 
         # init the plotting
         self.anim = Animation.FuncAnimation(self.fig,
@@ -254,6 +259,7 @@ class Lattice(Thread):
         self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
+
 
 
 if __name__ == '__main__':
