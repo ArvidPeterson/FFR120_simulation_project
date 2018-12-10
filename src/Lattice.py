@@ -54,13 +54,15 @@ class Lattice(Thread):
         self.init_topology()
         self.frames = [self.plot_matrix]
         self.population_dynamics_ax = self.fig.add_subplot(122)
-        # create plots for population dynamics
+
+        # ----- create plots for population dynamics
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
         self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
         self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        plt.legend()
         plt.grid = True
 
-        # init the plotting
+        # ----- init the plotting
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
                                             blit=False,
@@ -270,8 +272,15 @@ class Lattice(Thread):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
         self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
-        self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
+        #self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
+
+        self.rat_popu_plot.set_xdata(self.time_record)
+        self.rat_popu_plot.set_ydata(self.rat_population_record)
+
+        plt.draw()
+        plt.pause(1e-17)
+
 
 if __name__ == '__main__':
     lattice_size = 200
