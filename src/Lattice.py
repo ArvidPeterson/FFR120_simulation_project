@@ -179,7 +179,7 @@ class Lattice(Thread):
             print("bird not in location_matrixs")
             print(self.location_matrix[x][y])
 
-    def kill_birds_and_nests(self)
+    def kill_birds_and_nests(self):
         rats_with_vision = True  # temporary ugly solution
         if rats_with_vision:
             self.range_vision_kill_function()
