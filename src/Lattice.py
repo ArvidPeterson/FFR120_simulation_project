@@ -163,19 +163,19 @@ class Lattice(Thread):
         for i_nest, nest in enumerate(self.nest_list):
             x, y = nest.x, nest.y
 
-            a = self.get_birds_on_neighbouring_positions(x,y)
-
             # --- list all agents on the site with the nest --- #
             bird_list = []
             rat_list = []
             for agent_on_site in self.location_matrix[x][y]:
                 if isinstance(agent_on_site, Rat):
                     rat_list.append(agent_on_site)
+                    tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
+                    bird_list.append(tmp_bird_list)
                 if isinstance(agent_on_site, Bird):
                     bird_list.append(agent_on_site)
 
             # if there's a rat on the current site
-            if rat_list:
+            if rat_list:  # TODO: implement removing birds from neighbouring positions
                     for bird in bird_list:
                         if bird.is_in_nest:
                             self.bird_list.remove(bird)
