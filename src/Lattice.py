@@ -125,14 +125,22 @@ class Lattice(Thread):
         # --- make it beautiful! --- #
         self.plot_matrix[x, y] = self.bird_color_index
 
-    def gen_starting_pos(self):
+    def alt_gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
         # check that the coordinates are within island bounds
+        count = 0
         while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
             # check that current site is empty
             while not self.location_matrix[x][y]:
+                if count > int(1e4):
+                    raise TimeoutError("stuck in the while loop!")
                 x, y = np.random.randint(0, self.size, 2)
+                count += 1
         return x, y
+
+    def gen_unique_starting_pos(self):
+        x = np.random.randint((self.island_center - self.island_radius), (self.island_center + self.island_radius))
+        cosx = (x - self.island_center) / self.island_radius
 
 
     def move_and_age_rats(self):
@@ -238,8 +246,8 @@ class Lattice(Thread):
         for bird in self.bird_list:
             if not bird.has_nest:
                 x, y = bird.x, bird.y
-                old_x, old_y = x, y
 
+                # this moves the bird as by defalut!
                 self.location_matrix[x][y].remove(bird)
                 nest = bird.place_nest(self.nest_list)
                 x, y = bird.x, bird.y
@@ -247,14 +255,12 @@ class Lattice(Thread):
                 self.location_matrix[x][y].append(nest)
                 self.location_matrix[x][y].append(bird)
 
-
     def update_plot(self, i):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
         self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
-
 
 if __name__ == '__main__':
     lattice_size = 200
