@@ -6,7 +6,7 @@ import numpy as np
 
 class Bird(AgentSuper):
     def __init__(self, grid_size, x, y, topological_map, life_time=1):
-        AgentSuper.__init__(self, grid_size, x, y, life_time, topological_map)
+        AgentSuper.__init__(self, grid_size, x, y, topological_map, life_time)
         self.is_in_nest = True
         self.has_nest = False
 
@@ -37,19 +37,27 @@ class Bird(AgentSuper):
             # The coordinates of the current nest is turned into an index. This index is added to the list of indeces where nests exist.
             nest_indices.append(self.coordinate_to_index((nest.x, nest.y)))
         available_indices = np.delete(all_indices, nest_indices)
-        random_index = np.random.randint(0, available_indices.__len__())
+        random_index = np.random.randint(0, len(available_indices))
         (x_new_nest, y_new_nest) = self.index_to_coordinate(available_indices[random_index])
 
         while self.topological_map[x_new_nest, y_new_nest] < 1:
             # if position is spawned in water in topological map, get new random position
+            random_index = np.random.randint(0, len(available_indices))
             (x_new_nest, y_new_nest) = self.index_to_coordinate(available_indices[random_index])
 
         # ==========================================================
         some_life_time = 1  # THIS SHOULD BE SET TO THE PROPER VALUE
         # ==========================================================
 
-        # A new nest object is created
-        new_nest = Nest(self.grid_size, x_new_nest, y_new_nest, some_life_time)
+        # todo: might want to make nests have a different life time?
+
+        # --- place the new nest --- #
+        new_nest = Nest(self.grid_size, x_new_nest, y_new_nest, self.topological_map, self.life_time, self)
+
+        # --- move to the new nest --- #
+        self.x = x_new_nest
+        self.y = y_new_nest
+        self.has_nest = True
         return new_nest
 
     def is_rat(self, x):

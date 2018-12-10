@@ -9,8 +9,7 @@ from AgentSuper import AgentSuper
 class Rat(AgentSuper):  # inherits AgentSuper
 
     def __init__(self, grid_size, x_start, y_start, topological_map, life_time):
-        AgentSuper.__init__(self, grid_size, x_start, y_start, life_time)
-        self.topological_map = topological_map
+        AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
 
     def move(self):
 

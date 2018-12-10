@@ -5,11 +5,12 @@ from AgentSuper import AgentSuper
 
 
 class Nest(AgentSuper):
-    def __init__(self, grid_size, x, y, life_time):
-        AgentSuper.__init__(self, grid_size, x, y, life_time)
+    def __init__(self, grid_size, x_start, y_start, topological_map, life_time, parent):
+        AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
         self.hatch_time = self.life_time
         self.counter = 0
+        self.parent = parent
 
-
-    def move(self):
+    def tick(self):
         self.counter += 1
+
