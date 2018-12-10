@@ -51,9 +51,14 @@ class Lattice(Thread):
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
-        self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
         self.frames = [self.plot_matrix]
+        self.population_dynamics_ax = self.fig.add_subplot(122)
+        # create plots for population dynamics
+        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
+        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
+        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        plt.grid = True
 
         # init the plotting
         self.anim = Animation.FuncAnimation(self.fig,
@@ -178,13 +183,17 @@ class Lattice(Thread):
         x, y = agent.x, agent.y
 
         if isinstance(agent, Rat):
-            self.rat_list.remove(Rat)
+            self.rat_list.remove(agent)
+
         if isinstance(agent, Bird):
-             self.bird_list.remove(agent)
+            self.bird_list.remove(agent)  # remove the bird
+            if agent.has_nest:  # also remove nest which otherwise is left dangling
+                self.nest_list.remove(agent.nest)
+                self.location_matrix[x][y].remove(agent.nest)
         try:
             self.location_matrix[x][y].remove(agent)
         except ValueError:
-            print("bird not in location_matrixs")
+            print("bird not in location_matrix")
             print(self.location_matrix[x][y])
 
     def kill_birds_and_nests(self):
@@ -233,12 +242,14 @@ class Lattice(Thread):
                 for agent in self.location_matrix[pos[0]][pos[1]]:
 
                     if isinstance(agent, Nest):
-                        if agent.parent.is_in_nest:  # if bird in nest, kill the bird
-                            self.location_matrix[x][y].remove(agent.parent)
-                            self.bird_list.remove(agent.parent)
-                        else:
-                            agent.parent.has_nest = False  # if parent bird not in nest let it continue
-
+                        try:
+                            if agent.parent.is_in_nest:  # if bird in nest, kill the bird
+                                self.location_matrix[x][y].remove(agent.parent)
+                                self.bird_list.remove(agent.parent)
+                            else:
+                                agent.parent.has_nest = False  # if parent bird not in nest let it continue
+                        except ValueError:
+                            print('Missing agent')
                         self.location_matrix[x][y].remove(agent)  # anyway kill the nest
                         self.nest_list.remove(agent)
 
