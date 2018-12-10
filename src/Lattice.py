@@ -153,7 +153,6 @@ class Lattice(Thread):
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
-
     def move_and_age_birds(self):
         for bird in self.bird_list:
             bird.age += 1
@@ -167,61 +166,77 @@ class Lattice(Thread):
             if bird.age > bird.life_time:
                 self.kill_agent(bird)
 
-
     def kill_agent(self, agent):
         x, y = agent.x, agent.y
+        str = ''
         try:
             if isinstance(agent, Bird):
                 self.bird_list.remove(agent)
+                str = 'bird'
             if isinstance(agent, Rat):
                 self.rat_list.remove(agent)
+                str = 'rat'
             self.location_matrix[x][y].remove(agent)
         except  ValueError:
             print('value_error')
+            print(str)
 
     def kill_birds_and_nests(self):
-        for i_nest, nest in enumerate(self.nest_list):
-            x, y = nest.x, nest.y
+        rats_with_vision = True
+        if rats_with_vision:
+            self.range_vision_kill_function()
+        else:
 
-            # --- list all agents on the site with the nest --- #
-            bird_list = []
-            rat_list = []
-            for agent_on_site in self.location_matrix[x][y]:
-                if isinstance(agent_on_site, Rat):
-                    rat_list.append(agent_on_site)
-                    #tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
-                    #bird_list += tmp_bird_list
-                if isinstance(agent_on_site, Bird):
-                    bird_list.append(agent_on_site)
+            for i_nest, nest in enumerate(self.nest_list):
+                x, y = nest.x, nest.y
 
-            # if there's a rat on the current site
-            if rat_list:  # TODO: implement removing birds from neighbouring positions??
-                    for bird in bird_list:
-                        if bird.is_in_nest:
-                            self.bird_list.remove(bird)
-                            self.nest_list.remove(nest)
-                        else:
-                            bird.has_nest = False
-                            self.nest_list.remove(nest)
-                        self.location_matrix[x][y].remove(bird)
-                        try:
-                            self.location_matrix[x][y].remove(nest)
-                        except ValueError:
-                            logging.exception("something wrong with the nest removal")
+                # --- list all agents on the site with the nest --- #
+                bird_list = []
+                rat_list = []
+                for agent_on_site in self.location_matrix[x][y]:
+                    if isinstance(agent_on_site, Rat):
+                        rat_list.append(agent_on_site)
+                        #tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
+                        #bird_list += tmp_bird_list
+                    if isinstance(agent_on_site, Bird):
+                        bird_list.append(agent_on_site)
 
-    def range_vision_kill_function(self):
+                # if there's a rat on the current site
+                if rat_list:  # TODO: implement removing birds from neighbouring positions??
+                        for bird in bird_list:
+                            if bird.is_in_nest:
+                                self.bird_list.remove(bird)
+                                self.nest_list.remove(nest)
+                            else:
+                                bird.has_nest = False
+                                self.nest_list.remove(nest)
+                            self.location_matrix[x][y].remove(bird)
+                            try:
+                                self.location_matrix[x][y].remove(nest)
+                            except ValueError:
+                                logging.exception("something wrong with the nest removal")
+
+    def range_vision_kill_function(self):  # kills nest neighbouring to a rat
         for rat in self.rat_list:
-
             position_list = np.array([[rat.x - 1, rat.y], [rat.x + 1, rat.y], [rat.x, rat.y - 1], [rat.x, rat.y + 1]])
 
-            position_list[position_list < 0] = 0
-
+            position_list[position_list < 0] = 0  # limit the indices to be within grid
             position_list[position_list > self.size - 1] = self.size
 
-            for pos in position_list:  # loop over neighbouring birds # TODO: remove nests as well
+            for pos in position_list:
+                x = pos[0]
+                y = pos[1]
                 for agent in self.location_matrix[pos[0]][pos[1]]:
-                    if isinstance(agent, Bird):
-                        self.location_matrix[pos[0]][pos[1]].remove(agent)
+
+                    if isinstance(agent, Nest):
+                        if agent.parent.is_in_nest:  # if bird in nest, kill the bird
+                            self.location_matrix[x][y].remove(agent.parent)
+                            self.bird_list.remove(agent.parent)
+                        else:
+                            agent.parent.has_nest = False  # if parent bird not in nest let it continue
+
+                        self.location_matrix[x][y].remove(agent)  # anyway kill the nest
+                        self.nest_list.remove(agent)
 
     def build_nests(self):
         for bird in self.bird_list:
