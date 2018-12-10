@@ -10,10 +10,11 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
     def __init__(self, grid_size, x_start, y_start, topological_map, life_time):
         AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
+        self.last_direction_idx = 0
+
+    ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
 
     def move(self):
-
-        ''' Moves the rat one step in a random walk, von Neuman neighbourhood '''
 
         self.life_time += 1
 
@@ -22,14 +23,21 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         direction = np.random.randint(0, 4)
 
-        if direction == 0:  # go right
+        if direction == 0 and self.last_direction_idx != 1:  # go right
             x += 1
-        elif direction == 1:  # go left
+            self.last_direction_idx = 0
+
+        elif direction == 1 and self.last_direction_idx != 0:  # go left
             x -= 1
-        elif direction == 2:  # go up
+            self.last_direction_idx = 1
+
+        elif direction == 2 and self.last_direction_idx != 3:  # go up
             y += 1
-        elif direction == 3:  # go down
+            self.last_direction_idx = 2
+
+        elif direction == 3 and self.last_direction_idx != 2:  # go down
             y -= 1
+            self.last_direction_idx = 3
 
         coord = np.array([x, y])
 
@@ -43,8 +51,6 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         self.x = coord[0]
         self.y = coord[1]
-
-
 
         return [self.x, self.y]
 
