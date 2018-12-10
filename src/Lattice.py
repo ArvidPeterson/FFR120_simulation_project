@@ -87,9 +87,12 @@ class Lattice(Thread):
 
     def step(self, i_step):
         self.step_count += 1
+
+        # this step should also age the agents
         self.move_rats()
         self.move_birds()
         self.kill_birds_and_nests()
+        self.eval_agent_life_time()
         self.build_nests()
         self.hatch()
 
@@ -158,6 +161,24 @@ class Lattice(Thread):
                 self.plot_matrix[x][y] = self.bird_color_index
             else:
                 self.plot_matrix[x][y] = self.nest_color_index
+
+
+    def eval_agent_life_time(self):
+        for bird in self.bird_list:
+            if bird.age > bird.life_time:
+                self.kill_agent(bird)
+
+        for rat in self.rat_list:
+            if rat.age > rat.life_time:
+                self.kill_agent(rat)
+
+    def kill_agent(self, agent):
+        x, y = agent.x, agent.y
+        if isinstance(agent, Bird):
+            self.bird_list.remove(agent)
+        if isinstance(agent, Rat):
+            self.rat_list.remove(agent)
+        self.location_matrix[x][y].remove(agent)
 
     def kill_birds_and_nests(self):
         for i_nest, nest in enumerate(self.nest_list):
