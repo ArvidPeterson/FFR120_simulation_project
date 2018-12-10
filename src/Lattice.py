@@ -58,6 +58,7 @@ class Lattice(Thread):
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
         self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
         self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        plt.legend()
         plt.grid = True
 
         # init the plotting
@@ -262,9 +263,23 @@ class Lattice(Thread):
     def update_plot(self, i):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
-        self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
-        self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
-        self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
+        #self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
+        #self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
+        #self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
+
+        # ---  set data for the different plots
+
+        self.rat_popu_plot.set_xdata(self.time_record)
+        self.rat_popu_plot.set_ydata(self.rat_population_record)
+
+        self.bird_popu_plot.set_xdata(self.time_record)
+        self.bird_popu_plot.set_ydata(self.bird_population_record)
+
+        self.nest_popu_plot.set_xdata(self.time_record)
+        self.nest_popu_plot.set_ydata(self.nest_population_record)
+
+        plt.draw()  # lend resources to redraw
+        plt.pause(1e-17)
 
 
 if __name__ == '__main__':
