@@ -51,10 +51,19 @@ class Lattice(Thread):
         self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
-        self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
         #self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
+        # ---- Create plots to show continously updated population dynamics
+        self.population_dynamics_ax = self.fig.add_subplot(122)
+        self.bird_population_plot, = self.population_dynamics_ax.plot([], [], color='r')
+        self.nest_population_plot, = self.population_dynamics_ax.plot([], [], color='b')
+        self.rat_population_plot, = self.population_dynamics_ax.plot([], [], color='g')
+
+        self.bird_population_plot.set_label('bird population')
+        self.nest_population_plot.set_label('nest population')
+        self.rat_population_plot.set_label('rat population')
+
 
         # --- plot ---
 
@@ -237,7 +246,7 @@ class Lattice(Thread):
                         else:
                             agent.parent.has_nest = False  # if parent bird not in nest let it continue
 
-                        self.location_matrix[x][y].remove(agent)  # anyway kill the nest
+                        self.location_matrix[x][y].remove(agent)  # anyway, kill the nest
                         self.nest_list.remove(agent)
 
     def build_nests(self):
