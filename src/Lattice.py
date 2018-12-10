@@ -169,13 +169,13 @@ class Lattice(Thread):
             for agent_on_site in self.location_matrix[x][y]:
                 if isinstance(agent_on_site, Rat):
                     rat_list.append(agent_on_site)
-                    tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
-                    bird_list.append(tmp_bird_list)
+                    #tmp_bird_list = self.get_birds_on_neighbouring_positions(agent_on_site.x, agent_on_site.y)
+                    #bird_list += tmp_bird_list
                 if isinstance(agent_on_site, Bird):
                     bird_list.append(agent_on_site)
 
             # if there's a rat on the current site
-            if rat_list:  # TODO: implement removing birds from neighbouring positions
+            if rat_list:  # TODO: implement removing birds from neighbouring positions??
                     for bird in bird_list:
                         if bird.is_in_nest:
                             self.bird_list.remove(bird)
@@ -189,21 +189,19 @@ class Lattice(Thread):
                         except ValueError:
                             logging.exception("something wrong with the nest removal")
 
-    def get_birds_on_neighbouring_positions(self, x, y):
+    def range_vision_kill_function(self):
+        for rat in self.rat_list:
 
-        position_list = np.array([[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]])
+            position_list = np.array([[rat.x - 1, rat.y], [rat.x + 1, rat.y], [rat.x, rat.y - 1], [rat.x, rat.y + 1]])
 
-        position_list[position_list < 0] = 0
+            position_list[position_list < 0] = 0
 
-        position_list[position_list > self.size - 1] = self.size
-        bird_list = []
+            position_list[position_list > self.size - 1] = self.size
 
-        for pos in position_list:  # loop over neighbouring birds
-            for agent in self.location_matrix[pos[0]][pos[1]]:
-                if isinstance(agent, Bird):
-                    bird_list.append(agent)
-
-        return bird_list
+            for pos in position_list:  # loop over neighbouring birds # TODO: remove nests as well
+                for agent in self.location_matrix[pos[0]][pos[1]]:
+                    if isinstance(agent, Bird):
+                        self.location_matrix[pos[0]][pos[1]].remove(agent)
 
     def build_nests(self):
         for bird in self.bird_list:

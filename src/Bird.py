@@ -60,5 +60,5 @@ class Bird(AgentSuper):
         self.has_nest = True
         return new_nest
 
-    def is_rat(self, x):
+    def is_rat(self, x):  # TODO: Remove?
         return isinstance(x, Rat)
