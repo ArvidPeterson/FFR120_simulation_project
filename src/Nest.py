@@ -14,3 +14,5 @@ class Nest(AgentSuper):
     def tick(self):
         self.counter += 1
 
+    def hatch(self):
+        self.counter = 0

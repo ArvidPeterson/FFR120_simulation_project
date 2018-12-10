@@ -32,7 +32,7 @@ class Lattice(Thread):
         self.n_rats = n_rats
         self.rat_lifetime = 100
         self.bird_lifetime = 100
-        self.hatch_time = 50
+        self.hatch_time = 10
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -53,14 +53,11 @@ class Lattice(Thread):
         self.environment_ax = self.fig.add_subplot(121)
         self.population_dynamics_ax = self.fig.add_subplot(122)
         self.init_topology()
-        #self.im = plt.imshow(self.plot_matrix, animated=True, cmap=self.cmap, vmin=0, vmax=5)
         self.frames = [self.plot_matrix]
 
-        # --- plot ---
-
+        # init the plotting
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
-                                            frames=range(0, self.n_sim_steps),
                                             blit=False,
                                             interval=50)
 
@@ -88,55 +85,52 @@ class Lattice(Thread):
 
     def step(self, i_step):
         self.step_count += 1
-
-        # this step should also age the agents
         self.move_and_age_rats()
         self.move_and_age_birds()
         self.kill_birds_and_nests()
-        # self.build_nests()
-        # self.hatch()
+        #self.build_nests()
+        #self.age_and_hatch_nests()
 
     def init_agents(self):
-
-        # --- init rats --- #
+        # spawn rat agents
         for i_rat in range(self.n_rats):
-            x_start, y_start = self.gen_starting_pos()
-            rat = Rat(self.size, x_start, y_start, self.topological_map, self.rat_lifetime)
-            self.location_matrix[x_start][y_start].append(rat)
-            self.plot_matrix[x_start, y_start] = self.rat_color_index
+            x, y= self.gen_starting_pos()
+            rat = Rat(self.size, x, y, self.topological_map, self.rat_lifetime)
+            self.location_matrix[x][y].append(rat)
+            self.plot_matrix[x,y] = self.rat_color_index
             self.rat_list.append(rat)
 
-        # --- init birds and nests --- #
         for i_bird in range(self.n_birds):
-            x_start, y_start = self.gen_starting_pos()
-            bird = Bird(self.size, x_start, y_start, self.topological_map)
-            nest = Nest(self.size, x_start, y_start, self.topological_map, self.hatch_time, bird)
+            x, y = self.gen_starting_pos()
+            self.spawn_bird_and_nest(x, y)
 
-
-            self.location_matrix[x_start][y_start].append(bird)
-            self.location_matrix[x_start][y_start].append(nest)
-            self.plot_matrix[x_start, y_start] = self.bird_color_index
-
-            self.nest_list.append(nest)
-            self.bird_list.append(bird)
-
-
-
-    def hatch(self):
+    def age_and_hatch_nests(self):
         for nest in self.nest_list:
+            nest.tick()
             if nest.counter > nest.hatch_time:
-                x, y = nest.hatch()
-                # --- spawn a bird ! --- #
+                nest.hatch()
                 x, y = self.gen_starting_pos()
-                bird = Bird(x, y)
-                self.bird_list.append(bird)
-                self.location_matrix[x][y].append(bird)
+                self.spawn_bird_and_nest(x, y)
+                
+    def spawn_bird_and_nest(self, x, y):
+        bird = Bird(self.size, x, y, self.topological_map, self.bird_lifetime)
+        nest = Nest(self.size, x, y, self.topological_map, self.hatch_time, bird)
+        bird.has_nest = True
 
-    # -- for generating independent starting positions --- #
+        # --- keeping tabs of the agents! --- #
+        self.nest_list.append(nest)
+        self.bird_list.append(bird)
+        self.location_matrix[x][y].append(bird)
+        self.location_matrix[x][y].append(nest)
+        # --- make it beautiful! --- #
+        self.plot_matrix[x, y] = self.bird_color_index
+
     def gen_starting_pos(self):
         x, y = np.random.randint(0, self.size, 2)
+        # check that the coordinates are within island bounds
         while math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) > self.island_radius:
-            while not self.location_matrix[x][y]: # make sure site is empy
+            # check that current site is empty
+            while not self.location_matrix[x][y]:
                 x, y = np.random.randint(0, self.size, 2)
         return x, y
 
@@ -205,14 +199,14 @@ class Lattice(Thread):
                         if bird.is_in_nest:
                             self.bird_list.remove(bird)
                             self.nest_list.remove(nest)
+                            self.location_matrix[x][y].remove(bird)
                         else:
                             bird.has_nest = False
                             self.nest_list.remove(nest)
-                        self.location_matrix[x][y].remove(bird)
-                        try:
-                            self.location_matrix[x][y].remove(nest)
-                        except ValueError:
-                            logging.exception("something wrong with the nest removal")
+
+                        self.location_matrix[x][y].remove(nest)
+
+
 
     def build_nests(self):
         for bird in self.bird_list:
