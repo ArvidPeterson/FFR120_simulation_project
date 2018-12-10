@@ -2,7 +2,7 @@ import logging
 import math
 import numpy as np
 import matplotlib
-matplotlib.use('qt5agg')
+matplotlib.use('qt4agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
