@@ -32,6 +32,7 @@ class Lattice(Thread):
         self.n_rats = n_rats
         self.rat_lifetime = 100
         self.bird_lifetime = 100
+        self.hatch_time = 50
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -92,8 +93,8 @@ class Lattice(Thread):
         self.move_and_age_rats()
         self.move_and_age_birds()
         self.kill_birds_and_nests()
-        self.build_nests()
-        self.hatch()
+        # self.build_nests()
+        # self.hatch()
 
     def init_agents(self):
 
@@ -109,9 +110,13 @@ class Lattice(Thread):
         for i_bird in range(self.n_birds):
             x_start, y_start = self.gen_starting_pos()
             bird = Bird(self.size, x_start, y_start, self.topological_map)
+            nest = Nest(self.size, x_start, y_start, self.topological_map, self.hatch_time, bird)
+
+
             self.location_matrix[x_start][y_start].append(bird)
+            self.location_matrix[x_start][y_start].append(nest)
             self.plot_matrix[x_start, y_start] = self.bird_color_index
-            nest = bird.place_nest(self.nest_list)
+
             self.nest_list.append(nest)
             self.bird_list.append(bird)
 
@@ -135,12 +140,13 @@ class Lattice(Thread):
                 x, y = np.random.randint(0, self.size, 2)
         return x, y
 
+
     def move_and_age_rats(self):
         for rat in self.rat_list:
             rat.age += 1
             x, y = rat.x, rat.y
             self.location_matrix[x][y].remove(rat)
-            
+
             # if there are no rats left on the old location
             # color the location green!
             for agent in self.location_matrix[x][y]:
@@ -168,18 +174,16 @@ class Lattice(Thread):
 
     def kill_agent(self, agent):
         x, y = agent.x, agent.y
-        str = ''
+
+        if isinstance(agent, Rat):
+            self.rat_list.remove(Rat)
+        if isinstance(agent, Bird):
+             self.bird_list.remove(agent)
         try:
-            if isinstance(agent, Bird):
-                self.bird_list.remove(agent)
-                str = 'bird'
-            if isinstance(agent, Rat):
-                self.rat_list.remove(agent)
-                str = 'rat'
             self.location_matrix[x][y].remove(agent)
-        except  ValueError:
-            print('value_error')
-            print(str)
+        except ValueError:
+            print("bird not in location_matrixs")
+            print(self.location_matrix[x][y])
 
     def kill_birds_and_nests(self):
         rats_with_vision = True  # temporary ugly solution
@@ -240,9 +244,11 @@ class Lattice(Thread):
         for bird in self.bird_list:
             if not bird.has_nest:
                 x, y = bird.x, bird.y
+                old_x, old_y = x, y
+
                 self.location_matrix[x][y].remove(bird)
                 nest = bird.place_nest(self.nest_list)
-                x, y = nest.x, nest.y
+                x, y = bird.x, bird.y
                 self.nest_list.append(nest)
                 self.location_matrix[x][y].append(nest)
                 self.location_matrix[x][y].append(bird)
