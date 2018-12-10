@@ -3,12 +3,15 @@ from Rat import Rat
 from Nest import Nest
 import numpy as np
 
+''' everybody knows, that the bird, is the word'''
+
 
 class Bird(AgentSuper):
     def __init__(self, grid_size, x, y, topological_map, life_time=1):
         AgentSuper.__init__(self, grid_size, x, y, topological_map, life_time)
         self.is_in_nest = True
         self.has_nest = False
+        self.nest = None  # reference to the nest object fpr which the bird is parent
 
     def check_is_in_nest(self):
         return self.is_in_nest
@@ -58,7 +61,8 @@ class Bird(AgentSuper):
         self.x = x_new_nest
         self.y = y_new_nest
         self.has_nest = True
+        self.nest = new_nest
         return new_nest
 
-    def is_rat(self, x):
+    def is_rat(self, x):  # TODO: Remove?
         return isinstance(x, Rat)
