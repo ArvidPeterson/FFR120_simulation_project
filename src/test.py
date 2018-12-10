@@ -1,6 +1,12 @@
 
 from Bird import Bird
 from Nest import Nest
+import numpy as np
+
+arr = np.array([[1, 2],[1,2],[1,2]])
+
+
+
 
 gridSize = 3
 

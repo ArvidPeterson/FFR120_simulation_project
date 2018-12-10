@@ -163,6 +163,8 @@ class Lattice(Thread):
         for i_nest, nest in enumerate(self.nest_list):
             x, y = nest.x, nest.y
 
+            a = self.get_birds_on_neighbouring_positions(x,y)
+
             # --- list all agents on the site with the nest --- #
             bird_list = []
             rat_list = []
@@ -187,6 +189,22 @@ class Lattice(Thread):
                         except ValueError:
                             logging.exception("something wrong with the nest removal")
 
+    def get_birds_on_neighbouring_positions(self, x, y):
+
+        position_list = np.array([[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]])
+
+        position_list[position_list < 0] = 0
+
+        position_list[position_list > self.size - 1] = self.size
+        bird_list = []
+
+        for pos in position_list:  # loop over neighbouring birds
+            for agent in self.location_matrix[pos[0]][pos[1]]:
+                if isinstance(agent, Bird):
+                    bird_list.append(agent)
+
+        return bird_list
+
     def build_nests(self):
         for bird in self.bird_list:
             if not bird.has_nest:
@@ -194,7 +212,6 @@ class Lattice(Thread):
                 nest = bird.place_nest(self.nest_list)
                 self.nest_list.append(nest)
                 self.location_matrix[x][y].append(nest)
-
 
     def update_plot(self, i):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap= self.cmap)
