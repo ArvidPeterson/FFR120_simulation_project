@@ -98,7 +98,8 @@ class Lattice:
         self.step_count += 1
         self.move_rats()
         self.update_plot(1)
-        #self.step_birds()
+        self.move_birds()
+        #self.step_birds() # should be self.move_birds()
         #self.kill_birds_and_nests()
         #self.build_nests()
         #self.hatch()
@@ -137,7 +138,7 @@ class Lattice:
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
-    def move_birds(self):
+    def move_birds(self):  # TODO: ADD THE BIRDS TO LOCATION MATRIX SO THEY CAN BE DRAWN
         for bird in self.bird_list:
             bird.move()  # sets the bird in or out of nest
 
