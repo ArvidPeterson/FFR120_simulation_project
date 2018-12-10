@@ -9,6 +9,7 @@ import matplotlib.colors as clr
 from threading import Thread
 from Bird import *
 from Rat import *
+import datetime
 
 class Lattice(Thread):
 
@@ -54,7 +55,7 @@ class Lattice(Thread):
         self.init_topology()
         self.frames = [self.plot_matrix]
         self.population_dynamics_ax = self.fig.add_subplot(122)
-        self.population_dynamics_ax.set_ylim(0, 1000)
+        self.population_dynamics_ax.set_ylim(0, 110)
 
         # create plots for population dynamics
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', ls='-', label='Rat population')
@@ -195,7 +196,7 @@ class Lattice(Thread):
         rats_with_vision = True  # temporary ugly solution
         if rats_with_vision:
             self.range_vision_kill_function()
-        else:
+        else:  # quick fix, remove the content of the else statement later
 
             for i_nest, nest in enumerate(self.nest_list):
                 x, y = nest.x, nest.y
@@ -283,6 +284,11 @@ class Lattice(Thread):
         tmp_m = max(self.time_record + [10])
         self.population_dynamics_ax.set_xlim(0, tmp_m)
 
+        title_str = 'n_rats: ' + str(len(self.rat_list)) + ', n_birds: ' + str(len(self.bird_list)) + ', n_nests: ' \
+                    + str(len(self.nest_list))
+
+        self.population_dynamics_ax.set(title=title_str)
+
         plt.draw()  # lend resources to redraw
         plt.pause(1e-17)
 
@@ -290,8 +296,9 @@ class Lattice(Thread):
 if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
-    n_rats = 1000
+    n_rats = 10
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
     plt.show()
+    print(datetime.datetime.now())
