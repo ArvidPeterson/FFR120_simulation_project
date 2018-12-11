@@ -15,7 +15,8 @@ class Lattice(Thread):
 
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps, *,
-                 plot_environment=True, plot_populations=False):
+                 plot_environment=True, plot_populations=False,
+                 ylim = None):
         Thread.__init__(self)
         # --- environment and general sim variables --- #
         self.size = size
@@ -34,7 +35,7 @@ class Lattice(Thread):
         self.rat_lifetime = 100
         self.bird_lifetime = 5000
         self.hatch_time = 1000
-        self.hatch_prob = 1/3
+        self.hatch_prob = .4
         self.nest_placement_delay = 200
         self.bird_list = []
         self.rat_list = []
@@ -59,12 +60,13 @@ class Lattice(Thread):
         self.environment_ax = self.fig.add_subplot(121)
         self.init_topology()
         self.population_dynamics_ax = self.fig.add_subplot(122)
+        self.ylim = max(self.n_rats, self.n_birds) if not ylim else ylim
 
         # ----- create plots for population dynamics
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
         self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
         self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-        self.population_dynamics_ax.set_ylim(0, max(self.n_rats, self.n_birds))
+        self.population_dynamics_ax.set_ylim(0, self.ylim)
 
         plt.legend()
         plt.grid = True
@@ -285,11 +287,8 @@ class Lattice(Thread):
                     + str(len(self.nest_list))
 
         self.population_dynamics_ax.set(title=title_str)
-<<<<<<< HEAD
         self.rat_popu_plot.set_xdata(self.time_record)
         self.rat_popu_plot.set_ydata(self.rat_population_record)
-=======
->>>>>>> 225af1029836e5ced3790286cf1cb38219a2e9ce
 
         plt.draw()
         plt.pause(1e-17)
@@ -300,8 +299,8 @@ if __name__ == '__main__':
     lattice_size = 500
     n_birds = 100
     n_rats = 100
-    n_sim_steps = int(1e5)
-    sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
+    n_sim_steps = int(5e4)
+    sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps, ylim=1.5*n_rats)
     sim.start()
     plt.show()
 
