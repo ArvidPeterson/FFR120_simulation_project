@@ -31,7 +31,7 @@ class Lattice(Thread):
         self.n_birds = n_birds
         self.n_rats = n_rats
         self.rat_lifetime = 100
-        self.bird_lifetime = 100
+        self.bird_lifetime = 5000
         self.hatch_time = 10
         self.bird_list = []
         self.rat_list = []
