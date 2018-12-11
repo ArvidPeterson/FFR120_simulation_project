@@ -140,13 +140,12 @@ class Lattice(Thread):
         bird.has_nest = True
         bird.nest = nest
 
-        # --- keeping tabs of the agents! --- #
+        # keep tabs of the book-keeping data
         self.nest_list.append(nest)
         self.bird_list.append(bird)
         self.location_matrix[x][y].append(bird)
         self.location_matrix[x][y].append(nest)
-        # --- make it beautiful! --- #
-        self.plot_matrix[x, y] = self.bird_color_index
+        self.recolor(x, y)
 
     def gen_starting_pos(self):
         # generate a random x within island bounds
@@ -184,6 +183,8 @@ class Lattice(Thread):
             self.recolor(x, y) # color the new rat location
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
+            if rat.energy < 0:
+                self.kill_agent(rat)
 
     def move_and_age_birds(self):
         for bird in self.bird_list:
@@ -212,7 +213,10 @@ class Lattice(Thread):
 
     def range_vision_kill_function(self):  # kills nest neighbouring to a rat
         for rat in self.rat_list:
-            position_list = np.array([[rat.x - 1, rat.y], [rat.x + 1, rat.y], [rat.x, rat.y - 1], [rat.x, rat.y + 1]])
+            position_list = np.array([[rat.x - 1, rat.y],
+                                      [rat.x + 1, rat.y],
+                                      [rat.x, rat.y - 1],
+                                      [rat.x, rat.y + 1]])
 
             position_list[position_list < 0] = 0  # limit the indices to be within grid
             position_list[position_list > self.size - 1] = self.size
