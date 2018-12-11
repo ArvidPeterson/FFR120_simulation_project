@@ -60,12 +60,8 @@ class Lattice(Thread):
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
         self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
         self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-        self.population_dynamics_ax.set_ylim(0, 110)
+        self.population_dynamics_ax.set_ylim(0, max(self.n_rats, self.n_birds))
 
-        # create plots for population dynamics
-        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', ls='-', label='Rat population')
-        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', ls='-',label='Bird population')
-        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', ls='-',label='Nest population')
         plt.legend()
         plt.grid = True
 
