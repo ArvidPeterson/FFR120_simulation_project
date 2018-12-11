@@ -125,6 +125,7 @@ class Lattice(Thread):
         bird = Bird(self.size, x, y, self.topological_map, self.bird_lifetime)
         nest = Nest(self.size, x, y, self.topological_map, self.hatch_time, bird)
         bird.has_nest = True
+        bird.nest = nest
 
         # --- keeping tabs of the agents! --- #
         self.nest_list.append(nest)
@@ -154,7 +155,7 @@ class Lattice(Thread):
 
     def gen_unique_starting_pos(self):
         x, y = self.gen_starting_pos()
-        while not self.location_matrix[x][y]:
+        while self.location_matrix[x][y]:
             x, y = self.gen_starting_pos()
         return x, y
 
@@ -192,6 +193,7 @@ class Lattice(Thread):
 
     def kill_agent(self, agent):  # used primarely when agents die from age
         x, y = agent.x, agent.y
+        self.location_matrix[x][y].remove(agent)
 
         if isinstance(agent, Rat):
             self.rat_list.remove(agent)
@@ -199,13 +201,10 @@ class Lattice(Thread):
         if isinstance(agent, Bird):
             self.bird_list.remove(agent)  # remove the bird
             if agent.has_nest:  # also remove nest which otherwise is left dangling
-                self.nest_list.remove(agent.nest)  # TODO: error is here. FIX!
+                self.nest_list.remove(agent.nest)
                 self.location_matrix[x][y].remove(agent.nest)
-        try:
-            self.location_matrix[x][y].remove(agent)
-        except ValueError:
-            print("bird not in location_matrix")
-            print(self.location_matrix[x][y])
+
+
 
     def kill_birds_and_nests(self):
         self.range_vision_kill_function()
