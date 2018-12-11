@@ -14,7 +14,8 @@ import datetime
 class Lattice(Thread):
 
 
-    def __init__(self, size, n_rats, n_birds, n_sim_steps, *,
+    def __init__(self, size, n_rats, n_birds, n_sim_steps,
+                 hatch_time, hatch_prob, nest_placement_delay, *,
                  plot_environment=True, plot_populations=False,
                  ylim = None):
         Thread.__init__(self)
@@ -33,10 +34,12 @@ class Lattice(Thread):
         self.n_birds = n_birds
         self.n_rats = n_rats
         self.rat_lifetime = 100
+        self.initial_rat_energy = 100
+        self.nest_nutritional_value = 100
         self.bird_lifetime = 5000
-        self.hatch_time = 1000
-        self.hatch_prob = .4
-        self.nest_placement_delay = 200
+        self.hatch_time = hatch_time #1000
+        self.hatch_prob = hatch_prob # .4
+        self.nest_placement_delay = nest_placement_delay #200
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -111,7 +114,8 @@ class Lattice(Thread):
         # spawn rat agents
         for i_rat in range(self.n_rats):
             x, y= self.gen_starting_pos()
-            rat = Rat(self.size, x, y, self.topological_map, self.rat_lifetime)
+            rat = Rat(self.size, x, y, self.topological_map,
+                      self.rat_lifetime, self.initial_rat_energy)
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x,y] = self.rat_color_index
             self.rat_list.append(rat)
@@ -172,11 +176,13 @@ class Lattice(Thread):
     def move_and_age_rats(self):
         for rat in self.rat_list:
             rat.age += 1
+            rat.energy -= 1
             x, y = rat.x, rat.y
             self.location_matrix[x][y].remove(rat)
 
             # if there are no rats left on the old location
             # color the location green!
+
             for agent in self.location_matrix[x][y]:
                 if isinstance(agent, Rat):
                     break
@@ -234,6 +240,7 @@ class Lattice(Thread):
                 for agent in self.location_matrix[pos[0]][pos[1]]:
 
                     if isinstance(agent, Nest):  # TODO: check for nestless birds as well
+                        rat.energy += self.nest_nutritional_value
                         try:
                             if agent.parent.is_in_nest:  # if bird in nest, kill the bird
                                 self.location_matrix[x][y].remove(agent.parent)
@@ -293,14 +300,34 @@ class Lattice(Thread):
         plt.draw()
         plt.pause(1e-17)
 
+    def recolor(self, x, y):
+        if Rat in map(type, self.location_matrix[x][y]):
+            self.plot_matrix[x][y] = self.rat_color_index
+        elif Bird in map(type, self.location_matrix[x][y]):
+            self.plot_matrix[x][y] = self.bird_color_index
+        elif Nest in map(type, self.location_matrix[x][y]):
+            self.plot_matrix[x][y] = self.nest_color_index
+        else:
+            self.plot_matrix[x][y] = self.land_color_index
+
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
     lattice_size = 500
     n_birds = 100
-    n_rats = 100
-    n_sim_steps = int(5e4)
-    sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps, ylim=1.5*n_rats)
+    n_rats = 10
+    n_sim_steps = int(2e5)
+    nest_placement_delay = 300
+    hatch_time = 50000
+    hatch_prob = .1
+    ylim = 200
+
+    sim = Lattice(lattice_size, n_rats, n_birds,
+                  n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
+                  ylim=ylim)
     sim.start()
     plt.show()
 
+#todo: rats die if they don't have food
+#todo: larger blobs for the agents so that they're better visualized
+#todo: fun for recoloring

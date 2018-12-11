@@ -8,10 +8,10 @@ from AgentSuper import AgentSuper
 
 class Rat(AgentSuper):  # inherits AgentSuper
 
-    def __init__(self, grid_size, x_start, y_start, topological_map, life_time):
+    def __init__(self, grid_size, x_start, y_start, topological_map, life_time, initial_energy):
         AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
         self.last_direction_idx = 0
-
+        self.energy = initial_energy
     ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
 
     def move(self):
