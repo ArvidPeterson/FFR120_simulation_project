@@ -12,6 +12,7 @@ class Bird(AgentSuper):
         self.is_in_nest = True
         self.has_nest = False
         self.nest = None  # reference to the nest object fpr which the bird is parent
+        self.nest_placement_timer = 0
 
     def check_is_in_nest(self):
         return self.is_in_nest

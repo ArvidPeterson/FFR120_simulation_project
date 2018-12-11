@@ -33,7 +33,9 @@ class Lattice(Thread):
         self.n_rats = n_rats
         self.rat_lifetime = 100
         self.bird_lifetime = 5000
-        self.hatch_time = 10
+        self.hatch_time = 1000
+        self.hatch_prob = 1/3
+        self.nest_placement_delay = 200
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -42,6 +44,9 @@ class Lattice(Thread):
         self.nest_population_record = []
         self.time_record = []
 
+        # --- booleans for testing purposes --- #
+        self.age_birds = False
+
         # --- plotting variables --- #
         self.water_color_index = 0
         self.land_color_index = 1
@@ -49,11 +54,10 @@ class Lattice(Thread):
         self.bird_color_index = 3
         self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['blue', 'green', 'red', 'yellow', 'black'])
+        self.cmap = clr.ListedColormap(['steelblue', 'limegreen', 'red', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
         self.init_topology()
-        self.frames = [self.plot_matrix]
         self.population_dynamics_ax = self.fig.add_subplot(122)
 
         # ----- create plots for population dynamics
@@ -87,19 +91,19 @@ class Lattice(Thread):
             self.step_count = i_step
 
             # --- save data so that it can be visualized async --- #
-            self.frames.append(np.copy(self.plot_matrix))
-            self.bird_population_record.append(len(self.bird_list))
-            self.rat_population_record.append(len(self.rat_list))
-            self.nest_population_record.append(len(self.nest_list))
-            self.time_record.append(i_step)
+            if i_step % 100 == 0:
+                self.bird_population_record.append(len(self.bird_list))
+                self.rat_population_record.append(len(self.rat_list))
+                self.nest_population_record.append(len(self.nest_list))
+                self.time_record.append(i_step)
 
     def step(self, i_step):
         self.step_count += 1
         self.move_and_age_rats()
         self.move_and_age_birds()
         self.kill_birds_and_nests()
-        #self.build_nests()
-        #self.age_and_hatch_nests()
+        self.build_nests()
+        self.age_and_hatch_nests()
 
     def init_agents(self):
         # spawn rat agents
@@ -117,8 +121,11 @@ class Lattice(Thread):
         for nest in self.nest_list:
             nest.tick()
             if nest.counter > nest.hatch_time:
-                nest.hatch()
-                self.spawn_bird_and_nest()
+                if np.random.rand() < self.hatch_prob:
+                    nest.hatch()
+                    self.spawn_bird_and_nest()
+                else:
+                    nest.counter = 0
                 
     def spawn_bird_and_nest(self):
         x, y = self.gen_unique_starting_pos()
@@ -188,8 +195,9 @@ class Lattice(Thread):
             else:
                 self.plot_matrix[x][y] = self.nest_color_index
 
-            if bird.age > bird.life_time:
-                self.kill_agent(bird)
+            if self.age_birds:
+                if bird.age > bird.life_time:
+                    self.kill_agent(bird)
 
     def kill_agent(self, agent):  # used primarely when agents die from age
         x, y = agent.x, agent.y
@@ -242,18 +250,23 @@ class Lattice(Thread):
     def build_nests(self):
         for bird in self.bird_list:
             if not bird.has_nest:
-                x, y = bird.x, bird.y
 
-                # this moves the bird as by defalut!
-                self.location_matrix[x][y].remove(bird)
-                nest = bird.place_nest(self.nest_list)
-                x, y = bird.x, bird.y
-                self.nest_list.append(nest)
-                self.location_matrix[x][y].append(nest)
-                self.location_matrix[x][y].append(bird)
+                #count the delay for the bird
+                if bird.nest_placement_timer < self.nest_placement_delay:
+                    bird.nest_placement_timer += 1
+                else:
+                    x, y = bird.x, bird.y
+
+                    # this moves the bird as by defalut!
+                    self.location_matrix[x][y].remove(bird)
+                    nest = bird.place_nest(self.nest_list)
+                    x, y = bird.x, bird.y
+                    self.nest_list.append(nest)
+                    self.location_matrix[x][y].append(nest)
+                    self.location_matrix[x][y].append(bird)
 
     def update_plot(self, i):
-        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
+        #self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
 
         self.rat_popu_plot.set_xdata(self.time_record)
@@ -272,10 +285,6 @@ class Lattice(Thread):
                     + str(len(self.nest_list))
 
         self.population_dynamics_ax.set(title=title_str)
-
-        plt.draw()  # lend resources to redraw
-        plt.pause(1e-17)
-
         self.rat_popu_plot.set_xdata(self.time_record)
         self.rat_popu_plot.set_ydata(self.rat_population_record)
 
@@ -285,10 +294,10 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
-    lattice_size = 200
+    lattice_size = 500
     n_birds = 100
-    n_rats = 10
-    n_sim_steps = int(1e4)
+    n_rats = 100
+    n_sim_steps = int(1e5)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
     plt.show()
