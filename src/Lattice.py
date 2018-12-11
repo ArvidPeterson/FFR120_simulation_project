@@ -231,7 +231,7 @@ class Lattice(Thread):
                 y = pos[1]
                 for agent in self.location_matrix[pos[0]][pos[1]]:
 
-                    if isinstance(agent, Nest):
+                    if isinstance(agent, Nest):  # TODO: check for nestless birds as well
                         try:
                             if agent.parent.is_in_nest:  # if bird in nest, kill the bird
                                 self.location_matrix[x][y].remove(agent.parent)
@@ -285,8 +285,11 @@ class Lattice(Thread):
                     + str(len(self.nest_list))
 
         self.population_dynamics_ax.set(title=title_str)
+<<<<<<< HEAD
         self.rat_popu_plot.set_xdata(self.time_record)
         self.rat_popu_plot.set_ydata(self.rat_population_record)
+=======
+>>>>>>> 225af1029836e5ced3790286cf1cb38219a2e9ce
 
         plt.draw()
         plt.pause(1e-17)
