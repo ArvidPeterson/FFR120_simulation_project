@@ -9,6 +9,7 @@ import matplotlib.colors as clr
 from threading import Thread
 from Bird import *
 from Rat import *
+import datetime
 
 class Lattice(Thread):
 
@@ -59,6 +60,12 @@ class Lattice(Thread):
         self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
         self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
         self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+        self.population_dynamics_ax.set_ylim(0, 110)
+
+        # create plots for population dynamics
+        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', ls='-', label='Rat population')
+        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', ls='-',label='Bird population')
+        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', ls='-',label='Nest population')
         plt.legend()
         plt.grid = True
 
@@ -187,7 +194,7 @@ class Lattice(Thread):
             if bird.age > bird.life_time:
                 self.kill_agent(bird)
 
-    def kill_agent(self, agent):
+    def kill_agent(self, agent):  # used primarely when agents die from age
         x, y = agent.x, agent.y
 
         if isinstance(agent, Rat):
@@ -196,7 +203,7 @@ class Lattice(Thread):
         if isinstance(agent, Bird):
             self.bird_list.remove(agent)  # remove the bird
             if agent.has_nest:  # also remove nest which otherwise is left dangling
-                self.nest_list.remove(agent.nest)
+                self.nest_list.remove(agent.nest)  # TODO: error is here. FIX!
                 self.location_matrix[x][y].remove(agent.nest)
         try:
             self.location_matrix[x][y].remove(agent)
@@ -208,7 +215,7 @@ class Lattice(Thread):
         rats_with_vision = True  # temporary ugly solution
         if rats_with_vision:
             self.range_vision_kill_function()
-        else:
+        else:  # quick fix, remove the content of the else statement later
 
             for i_nest, nest in enumerate(self.nest_list):
                 x, y = nest.x, nest.y
@@ -278,8 +285,27 @@ class Lattice(Thread):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
         self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)
-        #self.population_dynamics_ax.plot(self.time_record, self.rat_population_record)
         self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
+
+        self.rat_popu_plot.set_xdata(self.time_record)
+        self.rat_popu_plot.set_ydata(self.rat_population_record)
+
+        self.bird_popu_plot.set_xdata(self.time_record)
+        self.bird_popu_plot.set_ydata(self.bird_population_record)
+
+        self.nest_popu_plot.set_xdata(self.time_record)
+        self.nest_popu_plot.set_ydata(self.nest_population_record)
+
+        tmp_m = max(self.time_record + [10])
+        self.population_dynamics_ax.set_xlim(0, tmp_m)
+
+        title_str = 'n_rats: ' + str(len(self.rat_list)) + ', n_birds: ' + str(len(self.bird_list)) + ', n_nests: ' \
+                    + str(len(self.nest_list))
+
+        self.population_dynamics_ax.set(title=title_str)
+
+        plt.draw()  # lend resources to redraw
+        plt.pause(1e-17)
 
         self.rat_popu_plot.set_xdata(self.time_record)
         self.rat_popu_plot.set_ydata(self.rat_population_record)
@@ -290,9 +316,10 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     lattice_size = 200
-    n_birds = 400
-    n_rats = 1000
+    n_birds = 100
+    n_rats = 10
     n_sim_steps = int(1e4)
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
     plt.show()
+    print(datetime.datetime.now())
