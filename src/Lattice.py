@@ -58,7 +58,7 @@ class Lattice(Thread):
         self.bird_color_index = 3
         self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['steelblue', 'limegreen', 'red', 'yellow', 'black'])
+        self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
         self.init_topology()
@@ -106,7 +106,7 @@ class Lattice(Thread):
         self.step_count += 1
         self.move_and_age_rats()
         self.move_and_age_birds()
-        self.kill_birds_and_nests()
+        self.range_vision_kill_function()
         self.build_nests()
         self.age_and_hatch_nests()
 
@@ -179,17 +179,9 @@ class Lattice(Thread):
             rat.energy -= 1
             x, y = rat.x, rat.y
             self.location_matrix[x][y].remove(rat)
-
-            # if there are no rats left on the old location
-            # color the location green!
-
-            for agent in self.location_matrix[x][y]:
-                if isinstance(agent, Rat):
-                    break
-            else:
-                self.plot_matrix[x][y] = self.land_color_index
-
+            self.recolor(x, y) # recolor the old rat location
             x, y = rat.move()
+            self.recolor(x, y) # color the new rat location
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
@@ -198,11 +190,7 @@ class Lattice(Thread):
             bird.age += 1
             bird.move()  # sets the bird in or out of nest
             x, y = bird.x, bird.y
-            if bird.is_in_nest:
-                self.plot_matrix[x][y] = self.bird_color_index
-            else:
-                self.plot_matrix[x][y] = self.nest_color_index
-
+            self.recolor(x, y)
             if self.age_birds:
                 if bird.age > bird.life_time:
                     self.kill_agent(bird)
@@ -220,12 +208,7 @@ class Lattice(Thread):
                 self.nest_list.remove(agent.nest)
                 self.location_matrix[x][y].remove(agent.nest)
 
-        if not self.location_matrix[x][y]:
-            self.plot_matrix[x][y] = self.land_color_index
-
-
-    def kill_birds_and_nests(self):
-        self.range_vision_kill_function()
+        self.recolor(x, y)
 
     def range_vision_kill_function(self):  # kills nest neighbouring to a rat
         for rat in self.rat_list:
@@ -241,20 +224,15 @@ class Lattice(Thread):
 
                     if isinstance(agent, Nest):  # TODO: check for nestless birds as well
                         rat.energy += self.nest_nutritional_value
-                        try:
-                            if agent.parent.is_in_nest:  # if bird in nest, kill the bird
-                                self.location_matrix[x][y].remove(agent.parent)
-                                self.bird_list.remove(agent.parent)
-                            else:
-                                agent.parent.has_nest = False  # if parent bird not in nest let it continue
-                        except ValueError:
-                            print('Missing agent')
+                        if agent.parent.is_in_nest:  # if bird in nest, kill the bird
+                            self.location_matrix[x][y].remove(agent.parent)
+                            self.bird_list.remove(agent.parent)
+                        else:
+                            agent.parent.has_nest = False  # if parent bird not in nest let it continue
                         self.location_matrix[x][y].remove(agent)  # anyway kill the nest
                         self.nest_list.remove(agent)
 
-        # --- reset the color if successful kill! --- #
-                if not self.location_matrix[x][y]:
-                    self.plot_matrix[x][y] = self.land_color_index
+                self.recolor(x, y)
 
     def build_nests(self):
         for bird in self.bird_list:
@@ -275,7 +253,7 @@ class Lattice(Thread):
                     self.location_matrix[x][y].append(bird)
 
     def update_plot(self, i):
-        #self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
+        self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
 
         self.rat_popu_plot.set_xdata(self.time_record)
@@ -313,7 +291,7 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
-    lattice_size = 500
+    lattice_size = 100
     n_birds = 100
     n_rats = 10
     n_sim_steps = int(2e5)
