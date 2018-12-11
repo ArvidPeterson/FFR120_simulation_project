@@ -49,7 +49,7 @@ class Lattice(Thread):
         self.bird_color_index = 3
         self.nest_color_index = 4
         self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['blue', 'green', 'peru', 'yellow', 'black'])
+        self.cmap = clr.ListedColormap(['blue', 'green', 'red', 'yellow', 'black'])
         self.fig = plt.figure()
         self.environment_ax = self.fig.add_subplot(121)
         self.init_topology()
@@ -204,6 +204,8 @@ class Lattice(Thread):
                 self.nest_list.remove(agent.nest)
                 self.location_matrix[x][y].remove(agent.nest)
 
+        if not self.location_matrix[x][y]:
+            self.plot_matrix[x][y] = self.land_color_index
 
 
     def kill_birds_and_nests(self):
@@ -232,6 +234,10 @@ class Lattice(Thread):
                             print('Missing agent')
                         self.location_matrix[x][y].remove(agent)  # anyway kill the nest
                         self.nest_list.remove(agent)
+
+        # --- reset the color if successful kill! --- #
+                if not self.location_matrix[x][y]:
+                    self.plot_matrix[x][y] = self.land_color_index
 
     def build_nests(self):
         for bird in self.bird_list:
