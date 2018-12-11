@@ -311,6 +311,7 @@ class Lattice(Thread):
 
 
 if __name__ == '__main__':
+    print(datetime.datetime.now())
     lattice_size = 200
     n_birds = 100
     n_rats = 10
@@ -318,4 +319,4 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds, n_sim_steps)
     sim.start()
     plt.show()
-    print(datetime.datetime.now())
+
