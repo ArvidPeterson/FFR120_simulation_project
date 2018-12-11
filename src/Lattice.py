@@ -250,8 +250,6 @@ class Lattice(Thread):
     def update_plot(self, i):
         self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
         self.environment_ax.set_title("time: {}".format(self.step_count))
-        #self.population_dynamics_ax.plot(self.time_record, self.bird_population_record)  # old plotting
-        #self.population_dynamics_ax.plot(self.time_record, self.nest_population_record)
 
         self.rat_popu_plot.set_xdata(self.time_record)
         self.rat_popu_plot.set_ydata(self.rat_population_record)
