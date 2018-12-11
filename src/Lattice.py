@@ -208,37 +208,7 @@ class Lattice(Thread):
             print(self.location_matrix[x][y])
 
     def kill_birds_and_nests(self):
-        rats_with_vision = True  # temporary ugly solution
-        if rats_with_vision:
-            self.range_vision_kill_function()
-        else:  # quick fix, remove the content of the else statement later
-
-            for i_nest, nest in enumerate(self.nest_list):
-                x, y = nest.x, nest.y
-
-                # --- list all agents on the site with the nest --- #
-                bird_list = []
-                rat_list = []
-                for agent_on_site in self.location_matrix[x][y]:
-                    if isinstance(agent_on_site, Rat):
-                        rat_list.append(agent_on_site)
-                    if isinstance(agent_on_site, Bird):
-                        bird_list.append(agent_on_site)
-
-                # if there's a rat on the current site
-                if rat_list:  # TODO: implement removing birds from neighbouring positions??
-                        for bird in bird_list:
-                            if bird.is_in_nest:
-                                self.bird_list.remove(bird)
-                                self.nest_list.remove(nest)
-                            else:
-                                bird.has_nest = False
-                                self.nest_list.remove(nest)
-                            self.location_matrix[x][y].remove(bird)
-                            try:
-                                self.location_matrix[x][y].remove(nest)
-                            except ValueError:
-                                logging.exception("something wrong with the nest removal")
+        self.range_vision_kill_function()
 
     def range_vision_kill_function(self):  # kills nest neighbouring to a rat
         for rat in self.rat_list:
