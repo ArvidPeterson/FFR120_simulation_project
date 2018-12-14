@@ -66,6 +66,8 @@ class Lattice(Thread):
         self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
         self.fig = plt.figure()
 
+        self.max_ever_population = 1  # keep track of the largest population ever
+
         if self.plot_environment and self.plot_populations:
             self.environment_ax = self.fig.add_subplot(121)
             self.population_dynamics_ax = self.fig.add_subplot(122)
@@ -303,11 +305,21 @@ class Lattice(Thread):
             self.nest_popu_plot.set_xdata(self.time_record)
             self.nest_popu_plot.set_ydata(self.nest_population_record)
 
+            n_rats = len(self.rat_list)
+            n_birds = len(self.bird_list)
+            n_nests = len(self.nest_list)
+
+            max_population = max([n_birds, n_rats, n_nests])
+
+            if max_population > self.max_ever_population:
+                self.max_ever_population = max_population
+
             tmp_m = max(self.time_record + [10])
             self.population_dynamics_ax.set_xlim(0, tmp_m)
+            self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 10) # sets the ylim to the largest population there ever was
 
-            title_str = 'n_rats: ' + str(len(self.rat_list)) + ', n_birds: ' + str(len(self.bird_list)) + ', n_nests: ' \
-                        + str(len(self.nest_list))
+            title_str = 'n_rats: ' + str(n_rats) + ', n_birds: ' + str(n_birds) + ', n_nests: ' \
+                        + str(n_nests)
 
             self.population_dynamics_ax.set(title=title_str)
             self.rat_popu_plot.set_xdata(self.time_record)
@@ -330,20 +342,21 @@ class Lattice(Thread):
 if __name__ == '__main__':
     print(datetime.datetime.now())
     lattice_size = 200
-    n_birds = 100
-    n_rats = 50
+    n_birds = 500
+    n_rats = 10
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
     hatch_prob = .5
     ylim = 200
-    rat_initial_energy = 1000
-    nutritional_value_of_nests = 10
+    rat_initial_energy = 10
+
+    nutritional_value_of_nests = 4
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=True, plot_populations=True)
+                  ylim=ylim, plot_environment=False, plot_populations=True)
     sim.start()
     plt.show()
 
