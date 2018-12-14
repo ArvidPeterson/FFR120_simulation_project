@@ -184,6 +184,7 @@ class Lattice(Thread):
             self.recolor(x, y) # color the new rat location
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
+
             if rat.energy < 0:
                 self.kill_agent(rat)
 

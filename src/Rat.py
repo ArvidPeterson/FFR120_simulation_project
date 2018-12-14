@@ -12,11 +12,18 @@ class Rat(AgentSuper):  # inherits AgentSuper
         AgentSuper.__init__(self, grid_size, x_start, y_start, topological_map, life_time)
         self.last_direction_idx = 0
         self.energy = initial_energy
+        self.p_move = 1.0
     ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
 
     def move(self):
 
         self.life_time += 1
+
+        r = np.random.rand()
+
+        if r > self.p_move:  # finite probability to move use to modulate aggression
+            return [self.x, self.y]
+
 
         x = self.x
         y = self.y
@@ -53,6 +60,8 @@ class Rat(AgentSuper):  # inherits AgentSuper
         self.y = coord[1]
 
         return [self.x, self.y]
+
+
 
 
 
