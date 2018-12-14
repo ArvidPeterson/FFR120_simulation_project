@@ -52,7 +52,10 @@ class Lattice(Thread):
         # --- booleans for testing purposes --- #
         self.age_birds = False
 
-        # --- plotting variables --- #
+        # --- init the environment --- #
+        self.init_topology()
+
+        # --- plotting variables, and init --- #
         self.plot_environment = plot_environment
         self.plot_populations = plot_populations
 
@@ -63,7 +66,8 @@ class Lattice(Thread):
         self.nest_color_index = 4
 
         self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
+        self.cmap = clr.ListedColormap(['dodgerblue', 'mediumseagreen', 'red', 'white', 'black'])
+
         self.fig = plt.figure()
 
         if self.plot_environment and self.plot_populations:
@@ -71,9 +75,9 @@ class Lattice(Thread):
             self.population_dynamics_ax = self.fig.add_subplot(122)
         elif self.plot_environment:
             self.environment_ax = self.fig.add_subplot(111)
+            self.environment_ax.axis('equal')
         elif self.plot_populations:
             self.population_dynamics_ax = self.fig.add_subplot(111)
-        self.init_topology()
 
         self.ylim = max(self.n_rats, self.n_birds) if not ylim else ylim
 
@@ -87,7 +91,7 @@ class Lattice(Thread):
         plt.legend()
         plt.grid = True
 
-        # ----- init the plotting
+        # --- init the plotting --- #
         self.anim = Animation.FuncAnimation(self.fig,
                                             self.update_plot,
                                             blit=False,
