@@ -189,7 +189,7 @@ class Lattice(Thread):
 
         # if we're in the outskirts of the island
         if ymax == ymin:
-            y = int(ymax) - 1 # todo: make sure that they're not placed on perimiter
+            y = int(ymax) - 1  # todo: make sure that they're not placed on perimiter
         else:
             y = np.random.randint(ymin, ymax)
 
@@ -201,16 +201,15 @@ class Lattice(Thread):
             x, y = self.gen_starting_pos()
         return x, y
 
-
     def move_and_age_rats(self):
         for rat in self.rat_list:
             rat.age += 1
             rat.energy -= 1
             x, y = rat.x, rat.y
             self.location_matrix[x][y].remove(rat)
-            self.recolor(x, y) # recolor the old rat location
+            self.recolor(x, y)  # recolor the old rat location
             x, y = rat.move()
-            self.recolor(x, y) # color the new rat location
+            self.recolor(x, y)  # color the new rat location
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
 
@@ -220,7 +219,6 @@ class Lattice(Thread):
             if rat.should_spawn_new_rat:
                 self.spawn_rat()
                 rat.has_spawned()
-
 
     def move_and_age_birds(self):
         for bird in self.bird_list:
@@ -278,7 +276,7 @@ class Lattice(Thread):
         for bird in self.bird_list:
             if not bird.has_nest:
 
-                #count the delay for the bird
+                # count the delay for the bird
                 if bird.nest_placement_timer < self.nest_placement_delay:
                     bird.nest_placement_timer += 1
                 else:
@@ -360,6 +358,6 @@ if __name__ == '__main__':
     sim.start()
     plt.show()
 
-#todo: rats die if they don't have food
-#todo: larger blobs for the agents so that they're better visualized
-#todo: fun for recoloring
+# todo: rats die if they don't have food   ---  DONE!
+# todo: larger blobs for the agents so that they're better visualized  ---  njaaaaaaaeh
+# todo: fun for recoloring  --- DONE!
