@@ -17,8 +17,7 @@ class Lattice(Thread):
     def __init__(self, size, n_rats, n_birds, n_sim_steps,
                  hatch_time, hatch_prob, nest_placement_delay,
                  rat_initial_energy, nutritional_value_of_nests,  *,
-                 plot_environment=False, plot_populations=True,
-                 ylim = None):
+                 plot_environment=False, plot_populations=True):
         Thread.__init__(self)
         # --- environment and general sim variables --- #
         self.size = size
@@ -52,9 +51,6 @@ class Lattice(Thread):
         # --- booleans for testing purposes --- #
         self.age_birds = False
 
-        # --- init the environment --- #
-        self.init_topology()
-
         # --- plotting variables, and init --- #
         self.plot_environment = plot_environment
         self.plot_populations = plot_populations
@@ -79,17 +75,20 @@ class Lattice(Thread):
         elif self.plot_populations:
             self.population_dynamics_ax = self.fig.add_subplot(111)
 
-        self.ylim = max(self.n_rats, self.n_birds) if not ylim else ylim
-
         # ----- create plots for population dynamics
         if self.plot_populations:
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+            self.ylim = max(self.n_rats, self.n_birds)
             self.population_dynamics_ax.set_ylim(0, self.ylim)
 
         plt.legend()
         plt.grid = True
+
+
+        # --- init the environment --- #
+        self.init_topology()
 
         # --- init the plotting --- #
         self.anim = Animation.FuncAnimation(self.fig,
@@ -317,6 +316,9 @@ class Lattice(Thread):
             self.rat_popu_plot.set_xdata(self.time_record)
             self.rat_popu_plot.set_ydata(self.rat_population_record)
 
+            self.ylim = max(self.n_rats, self.n_birds)
+            self.population_dynamics_ax.set_ylim(0, self.ylim)
+
         plt.draw()
         plt.pause(1e-17)
 
@@ -339,7 +341,7 @@ if __name__ == '__main__':
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
-    hatch_prob = .5
+    hatch_prob = 1
     ylim = 200
     rat_initial_energy = 1000
     nutritional_value_of_nests = 10
@@ -347,7 +349,7 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=True, plot_populations=True)
+                  plot_environment=False, plot_populations=True)
     sim.start()
     plt.show()
 
