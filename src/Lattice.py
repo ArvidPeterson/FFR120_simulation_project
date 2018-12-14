@@ -119,6 +119,14 @@ class Lattice(Thread):
                 self.nest_population_record.append(len(self.nest_list))
                 self.time_record.append(i_step)
 
+            # if rats or birds are extinct the simulation stops
+            n_alive_birds = len(self.bird_list)
+            n_alive_rats = len(self.rat_list)
+
+            if n_alive_birds * n_alive_rats == 0:
+                break  # quit simulation
+
+
     def step(self, i_step):
         self.step_count += 1
         self.move_and_age_rats()
@@ -130,15 +138,22 @@ class Lattice(Thread):
     def init_agents(self):
         # spawn rat agents
         for i_rat in range(self.n_rats):
-            x, y= self.gen_starting_pos()
+            x, y = self.gen_starting_pos()
             rat = Rat(self.size, x, y, self.topological_map,
                       self.rat_lifetime, self.initial_rat_energy)
             self.location_matrix[x][y].append(rat)
-            self.plot_matrix[x,y] = self.rat_color_index
+            self.plot_matrix[x, y] = self.rat_color_index
             self.rat_list.append(rat)
 
         for i_bird in range(self.n_birds):
             self.spawn_bird_and_nest()
+
+    def spawn_rat(self):
+        x, y = self.gen_starting_pos()
+        rat = Rat(self.size, x, y, self.topological_map, self.rat_lifetime, self.initial_rat_energy)
+        self.location_matrix[x][y].append(rat)
+        self.plot_matrix[x, y] = self.rat_color_index
+        self.rat_list.append(rat)
 
     def age_and_hatch_nests(self):
         for nest in self.nest_list:
@@ -203,6 +218,11 @@ class Lattice(Thread):
 
             if rat.energy < 0:
                 self.kill_agent(rat)
+
+            if rat.should_spawn_new_rat:
+                self.spawn_rat()
+                rat.has_spawned()
+
 
     def move_and_age_birds(self):
         for bird in self.bird_list:
@@ -322,8 +342,7 @@ if __name__ == '__main__':
     hatch_prob = .5
     ylim = 200
     rat_initial_energy = 1000
-    nutritional_value_of_nests = 10000
-
+    nutritional_value_of_nests = 10
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
