@@ -126,15 +126,22 @@ class Lattice(Thread):
     def init_agents(self):
         # spawn rat agents
         for i_rat in range(self.n_rats):
-            x, y= self.gen_starting_pos()
+            x, y = self.gen_starting_pos()
             rat = Rat(self.size, x, y, self.topological_map,
                       self.rat_lifetime, self.initial_rat_energy)
             self.location_matrix[x][y].append(rat)
-            self.plot_matrix[x,y] = self.rat_color_index
+            self.plot_matrix[x, y] = self.rat_color_index
             self.rat_list.append(rat)
 
         for i_bird in range(self.n_birds):
             self.spawn_bird_and_nest()
+
+    def spawn_rat(self):
+        x, y = self.gen_starting_pos()
+        rat = Rat(self.size, x, y, self.topological_map, self.rat_lifetime, self.initial_rat_energy)
+        self.location_matrix[x][y].append(rat)
+        self.plot_matrix[x, y] = self.rat_color_index
+        self.rat_list.append(rat)
 
     def age_and_hatch_nests(self):
         for nest in self.nest_list:
@@ -199,6 +206,11 @@ class Lattice(Thread):
 
             if rat.energy < 0:
                 self.kill_agent(rat)
+
+            if rat.should_spawn_new_rat:
+                self.spawn_rat()
+                rat.has_spawned()
+
 
     def move_and_age_birds(self):
         for bird in self.bird_list:
