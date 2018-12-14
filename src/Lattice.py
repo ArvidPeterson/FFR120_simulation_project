@@ -78,10 +78,11 @@ class Lattice(Thread):
         self.ylim = max(self.n_rats, self.n_birds) if not ylim else ylim
 
         # ----- create plots for population dynamics
-        self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
-        self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
-        self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-        self.population_dynamics_ax.set_ylim(0, self.ylim)
+        if self.plot_populations:
+            self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
+            self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
+            self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+            self.population_dynamics_ax.set_ylim(0, self.ylim)
 
         plt.legend()
         plt.grid = True
