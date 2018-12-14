@@ -15,7 +15,8 @@ class Lattice(Thread):
 
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps,
-                 hatch_time, hatch_prob, nest_placement_delay, *,
+                 hatch_time, hatch_prob, nest_placement_delay,
+                 rat_initial_energy, nutritional_value_of_nests,  *,
                  plot_environment=True, plot_populations=False,
                  ylim = None):
         Thread.__init__(self)
@@ -35,7 +36,7 @@ class Lattice(Thread):
         self.n_rats = n_rats
         self.rat_lifetime = 100
         self.initial_rat_energy = 100
-        self.nest_nutritional_value = 100
+        self.nest_nutritional_value = nutritional_value_of_nests
         self.bird_lifetime = 5000
         self.hatch_time = hatch_time #1000
         self.hatch_prob = hatch_prob # .4
@@ -295,17 +296,21 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
-    lattice_size = 100
+    lattice_size = 200
     n_birds = 100
-    n_rats = 10
-    n_sim_steps = int(2e5)
-    nest_placement_delay = 300
-    hatch_time = 50000
-    hatch_prob = .1
+    n_rats = 50
+    n_sim_steps = int(10)
+    nest_placement_delay = 200
+    hatch_time = 200
+    hatch_prob = .5
     ylim = 200
+    rat_initial_energy = 1000
+    nutritional_value_of_nests = 10000
+
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
+                  rat_initial_energy, nutritional_value_of_nests,
                   ylim=ylim)
     sim.start()
     plt.show()
