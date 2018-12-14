@@ -316,7 +316,7 @@ if __name__ == '__main__':
     lattice_size = 200
     n_birds = 100
     n_rats = 50
-    n_sim_steps = int(1000)
+    n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
     hatch_prob = .5
@@ -328,7 +328,7 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=True, plot_populations=False)
+                  ylim=ylim, plot_environment=True, plot_populations=True)
     sim.start()
     plt.show()
 

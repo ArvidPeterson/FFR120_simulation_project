@@ -19,12 +19,6 @@ class Rat(AgentSuper):  # inherits AgentSuper
 
         self.life_time += 1
 
-        r = np.random.rand()
-
-        if r > self.p_move:  # finite probability to move use to modulate aggression
-            return [self.x, self.y]
-
-
         x = self.x
         y = self.y
 
