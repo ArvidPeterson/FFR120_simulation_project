@@ -60,6 +60,7 @@ class Lattice(Thread):
         self.rat_color_index = 2
         self.bird_color_index = 3
         self.nest_color_index = 4
+        self.max_ever_population = 1
 
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
@@ -315,6 +316,14 @@ class Lattice(Thread):
             self.population_dynamics_ax.set(title=title_str)
             self.rat_popu_plot.set_xdata(self.time_record)
             self.rat_popu_plot.set_ydata(self.rat_population_record)
+
+            # --- set the y limit properly
+            max_pop = max([n_birds, n_rats, n_nests])
+
+            if max_pop > self.max_ever_population:
+                self.max_ever_population = max_pop
+
+            self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 10)
 
         plt.draw()
         plt.pause(1e-17)
