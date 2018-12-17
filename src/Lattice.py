@@ -18,7 +18,7 @@ class Lattice(Thread):
                  hatch_time, nest_placement_delay,
                  rat_initial_energy, nutritional_value_of_nests,  *,
                  plot_environment=False, plot_populations=True,
-                 ylim = None):
+                 ylim = None, population_plot_title='population'):
         Thread.__init__(self)
         # --- environment and general sim variables --- #
         self.size = size
@@ -314,6 +314,8 @@ class Lattice(Thread):
                         + str(n_nests)
 
             self.population_dynamics_ax.set(title=title_str)
+            self.population_dynamics_ax.set_xlabel('Time steps')
+            self.population_dynamics_ax.set_ylabel('Population sizes')
             self.rat_popu_plot.set_xdata(self.time_record)
             self.rat_popu_plot.set_ydata(self.rat_population_record)
 
@@ -356,7 +358,7 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=True, plot_populations=True)
+                  ylim=ylim, plot_environment=False,  plot_populations=True)
     sim.start()
     plt.show()
 
