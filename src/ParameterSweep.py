@@ -46,12 +46,12 @@ class ParamSweep:
 if __name__ == '__main__':
     lattice_size = 200
     hatch_time = 200
-    nutritional_value = 100
+    nutritional_value = 10
     rat_initial_energy = 100
     nest_placement_delay = 100
     n_sim_steps = int(1e3)
     n_rats_range = [5, 10]
-    n_birds_range = [100, 200]
+    n_birds_range = [100, 200, 500]
     sweep = ParamSweep(lattice_size, n_sim_steps, n_birds_range,
                        n_rats_range, hatch_time, rat_initial_energy,
                        nutritional_value, nest_placement_delay)

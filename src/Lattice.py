@@ -120,6 +120,7 @@ class Lattice(Thread):
             if n_alive_birds * n_alive_rats == 0:
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
+        self.population_dynamics_ax.set_ylim([0, self.max_ever_population])
 
         return self.bird_population_record.append(len(self.bird_list)),\
                 self.rat_population_record.append(len(self.rat_list)),\
