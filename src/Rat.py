@@ -70,6 +70,9 @@ class Rat(AgentSuper):  # inherits AgentSuper
     # sets the variable telling to spawn new rat or not
     def set_should_spawn(self):
         should_spawn = self.time_since_last_spawn > self.time_to_spawn_new_rat
+        r = np.random.rand()
+        should_spawn = r < 0.5 and should_spawn
+
         self.should_spawn_new_rat = should_spawn
 
     # resets spawning variables
