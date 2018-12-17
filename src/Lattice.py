@@ -2,7 +2,7 @@ import logging
 import math
 import numpy as np
 import matplotlib
-matplotlib.use('qt4agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
@@ -120,6 +120,7 @@ class Lattice(Thread):
             if n_alive_birds * n_alive_rats == 0:
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
+        self.population_dynamics_ax.set_ylim([0, self.max_ever_population + 100])
 
         return self.bird_population_record.append(len(self.bird_list)),\
                 self.rat_population_record.append(len(self.rat_list)),\
@@ -133,6 +134,10 @@ class Lattice(Thread):
         self.range_vision_kill_function()
         self.build_nests()
         self.age_and_hatch_nests()
+
+    def join(self):
+        Thread.join(self)
+        return self.bird_population_record, self.rat_population_record, self.nest_population_record, self.time_record
 
     def init_agents(self):
         # spawn rat agents
