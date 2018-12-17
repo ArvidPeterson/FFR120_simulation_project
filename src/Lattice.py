@@ -84,8 +84,8 @@ class Lattice(Thread):
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-
-
+            plt.legend()
+            plt.grid = True
 
         # ----- init the plotting
         if self.plot_environment or self.plot_populations:
@@ -364,8 +364,7 @@ if __name__ == '__main__':
     n_rats = 10
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
-    hatch_time = 200
-    ylim = 200
+    hatch_time = 150
 
     rat_initial_energy = 4
 
