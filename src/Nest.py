@@ -17,6 +17,7 @@ class Nest(AgentSuper):
 
     def hatch(self):
         self.counter = 0
+
     def _set_hatch_time(self):
         offs = int(0.1 * self.life_time * np.random.randn())  # set a 10 percent random offset
 
