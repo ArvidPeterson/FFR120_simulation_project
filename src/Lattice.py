@@ -279,7 +279,7 @@ class Lattice(Thread):
             if not bird.has_nest:
 
                 # count the delay for the bird
-                if bird.nest_placement_timer < self.nest_placement_delay:
+                if bird.nest_placement_timer < np.random.normal(self.nest_placement_delay, 1):
                     bird.nest_placement_timer += 1
                 else:
                     x, y = bird.x, bird.y
