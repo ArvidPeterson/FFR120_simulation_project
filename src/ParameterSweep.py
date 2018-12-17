@@ -1,6 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 from Lattice import Lattice
+import numpy as np
 
 # which vars should be fixed?
 # lattice_size, n_sim_steps,
@@ -55,13 +56,24 @@ class ParamSweep:
                             nbirds, nrats, self.nest_placement_delay, nutritional_value
                         ))
                         fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
-                        self.save_data(fig, fname)
+                        self.save_data(fig, fname, bird_pop=bird_pop)
                         plt.close(fig)
 
-    def save_data(self, fig, name):
+    def save_data(self, fig, name, bird_pop=[], rat_pop=[], nest_pop=[], time=[]):
         img_dir = 'save_data/img/' + str(name) + '.png'
         fig.savefig(img_dir)
 
+        data_name_v = ['bird_pop', 'rat_pop', 'nest_pop', 'time']
+        pop_v = [bird_pop, rat_pop, nest_pop, time]
+
+        num_data_dir = 'save_data/num/'
+
+        for ii in range(len(pop_v)):
+            pop = pop_v[ii]
+            if pop:
+                file_name = num_data_dir + name + '_' + data_name_v[ii]
+                np_data = np.array(pop)
+                np.save(file_name, np_data)
 
 if __name__ == '__main__':
     # fixed values
