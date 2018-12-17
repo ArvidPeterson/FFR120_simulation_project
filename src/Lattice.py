@@ -84,6 +84,7 @@ class Lattice(Thread):
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
 
 
+
         # ----- init the plotting
         if self.plot_environment or self.plot_populations:
             plt.legend()
@@ -109,7 +110,7 @@ class Lattice(Thread):
             self.step_count = i_step  # why is this changed in two  places ?
 
             # --- save data so that it can be visualized async --- #
-            if i_step % 100 == 0:
+            if i_step % 10 == 0:
                 self.bird_population_record.append(len(self.bird_list))
                 self.rat_population_record.append(len(self.rat_list))
                 self.nest_population_record.append(len(self.nest_list))
@@ -351,14 +352,14 @@ class Lattice(Thread):
 if __name__ == '__main__':
     print(datetime.datetime.now())
     lattice_size = 200
-    n_birds = 100
-    n_rats = 50
+    n_birds = 500
+    n_rats = 10
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
     ylim = 200
 
-    rat_initial_energy = 10
+    rat_initial_energy = 4
 
     nutritional_value_of_nests = 100
 
