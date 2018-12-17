@@ -38,6 +38,10 @@ class ParamSweep:
                                     plot_populations=False)
                         sim.start()
                         bird_pop, rat_pop, nest_pop, time = sim.join()
+                        max_bird_pop = max(bird_pop)
+                        max_rat_pop = max(rat_pop)
+                        min_bird_pop = min(bird_pop)
+                        min_rat_pop = min(rat_pop)
                         fig, ax = plt.subplots()
                         plt.plot(time, bird_pop, color='blue', label='Bird population')
                         plt.plot(time, nest_pop, color='green', label='Nest population')
@@ -65,7 +69,7 @@ if __name__ == '__main__':
     hatch_time = 200
     rat_initial_energy = 100
     nest_placement_delay = 100
-    n_sim_steps = int(1e2)
+    n_sim_steps = int(1e3)
 
     # sweeping values
     rats_initial_populations = [5]
