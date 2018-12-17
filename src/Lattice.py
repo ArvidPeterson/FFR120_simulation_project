@@ -101,7 +101,7 @@ class Lattice(Thread):
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
-    def run(self):
+    def run(self):  # since Lattice inherits Thread this is called when doing Lattice.start()
         self.init_agents()
         for i_step in range(self.n_sim_steps):
             # --- perform current simulation step --- #
