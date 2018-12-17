@@ -73,6 +73,7 @@ class Lattice(Thread):
             self.environment_ax = self.fig.add_subplot(111)
         elif self.plot_populations:
             self.population_dynamics_ax = self.fig.add_subplot(111)
+
         self.init_topology()
 
 
@@ -82,14 +83,15 @@ class Lattice(Thread):
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
 
-        plt.legend()
-        plt.grid = True
 
         # ----- init the plotting
-        self.anim = Animation.FuncAnimation(self.fig,
-                                            self.update_plot,
-                                            blit=False,
-                                            interval=50)
+        if self.plot_environment or self.plot_populations:
+            plt.legend()
+            plt.grid = True
+            self.anim = Animation.FuncAnimation(self.fig,
+                                                self.update_plot,
+                                                blit=False,
+                                                interval=50)
 
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)

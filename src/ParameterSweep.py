@@ -42,7 +42,8 @@ class ParamSweep:
                         plt.plot(time, bird_pop, color='blue', label='Bird population')
                         plt.plot(time, nest_pop, color='green', label='Nest population')
                         plt.plot(time, rat_pop, color='red', label='Rat population')
-                        plt.legend()
+                        handles, labels = ax.get_legend_handles_labels()
+                        plt.legend(handles, labels)
                         ax.set_xlabel('Time steps')
                         ax.set_ylabel('Populations')
                         ax.set_title('initial bird population: {}, initial rat population: {}\n'
@@ -51,8 +52,7 @@ class ParamSweep:
                         ))
                         fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
                         self.save_plot(fig, fname)
-
-                #plt.close(fig)
+                        plt.close(fig)
 
     def save_plot(self, fig, name):
         dir = 'save_data/' + str(name) + '.png'
