@@ -1,3 +1,4 @@
+import numpy as np
 from matplotlib import pyplot as plt
 from Lattice import Lattice
 
@@ -35,7 +36,7 @@ class ParamSweep:
                                        plot_populations=True)
                 sim.start()
                 sim.join()
-                self.save_plot('test_plot')
+                self.save_plot('test_plot' + str(np.random.randint(100)))
 
     def save_plot(self, name):
         dir = 'save_data/' + str(name) + '.png'
