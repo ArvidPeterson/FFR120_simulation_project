@@ -82,8 +82,8 @@ class Lattice(Thread):
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
 
-        plt.legend()
-        plt.grid = True
+            plt.legend()
+            plt.grid = True
 
         # ----- init the plotting
         self.anim = Animation.FuncAnimation(self.fig,
