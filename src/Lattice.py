@@ -108,7 +108,7 @@ class Lattice(Thread):
         for i_step in range(self.n_sim_steps):
             # --- perform current simulation step --- #
             self.step(i_step)
-            self.step_count = i_step
+            self.step_count = i_step  # why is this changed in two  places ?
 
             # --- save data so that it can be visualized async --- #
             if i_step % 100 == 0:
@@ -124,6 +124,11 @@ class Lattice(Thread):
             if n_alive_birds * n_alive_rats == 0:
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
+
+        return self.bird_population_record.append(len(self.bird_list)),\
+                self.rat_population_record.append(len(self.rat_list)),\
+                self.nest_population_record.append(len(self.nest_list)),\
+                self.time_record.append(i_step)  # Returns to make statistics
 
     def step(self, i_step):
         self.step_count += 1
@@ -315,7 +320,7 @@ class Lattice(Thread):
             self.population_dynamics_ax.set_xlim(0, tmp_m)
             self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 10) # sets the ylim to the largest population there ever was
 
-            title_str = 'n_rats: ' + str(n_rats) + ', n_birds: ' + str(n_birds) + ', n_nests: ' \
+            title_str = 'Time: ' + str(self.step_count) + ' n_rats: ' + str(n_rats) + ', n_birds: ' + str(n_birds) + ', n_nests: ' \
                         + str(n_nests)
 
             self.population_dynamics_ax.set(title=title_str)
