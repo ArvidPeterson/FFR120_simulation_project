@@ -15,7 +15,7 @@ import datetime
 class Lattice(Thread):
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps,
-                 hatch_time, hatch_prob, nest_placement_delay,
+                 hatch_time, nest_placement_delay,
                  rat_initial_energy, nutritional_value_of_nests,  *,
                  plot_environment=False, plot_populations=True,
                  ylim = None):
@@ -39,7 +39,6 @@ class Lattice(Thread):
         self.nest_nutritional_value = nutritional_value_of_nests
         self.bird_lifetime = 5000
         self.hatch_time = hatch_time #1000
-        self.hatch_prob = hatch_prob # .4
         self.nest_placement_delay = nest_placement_delay #200
         self.bird_list = []
         self.rat_list = []
@@ -65,8 +64,6 @@ class Lattice(Thread):
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
         self.fig = plt.figure()
-
-        self.max_ever_population = 1  # keep track of the largest population ever
 
         if self.plot_environment and self.plot_populations:
             self.environment_ax = self.fig.add_subplot(121)
@@ -103,7 +100,7 @@ class Lattice(Thread):
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
-    def run(self):
+    def run(self):  # since Lattice inherits Thread this is called when doing Lattice.start()
         self.init_agents()
         for i_step in range(self.n_sim_steps):
             # --- perform current simulation step --- #
@@ -162,11 +159,9 @@ class Lattice(Thread):
         for nest in self.nest_list:
             nest.tick()
             if nest.counter > nest.hatch_time:
-                if np.random.rand() < self.hatch_prob:
-                    nest.hatch()
-                    self.spawn_bird_and_nest()
-                else:
-                    nest.counter = 0
+                nest.hatch()
+                self.spawn_bird_and_nest()
+                nest.counter = 0
                 
     def spawn_bird_and_nest(self):
         x, y = self.gen_unique_starting_pos()
@@ -281,7 +276,7 @@ class Lattice(Thread):
             if not bird.has_nest:
 
                 # count the delay for the bird
-                if bird.nest_placement_timer < self.nest_placement_delay:
+                if bird.nest_placement_timer < np.random.normal(self.nest_placement_delay, 1):
                     bird.nest_placement_timer += 1
                 else:
                     x, y = bird.x, bird.y
@@ -307,18 +302,12 @@ class Lattice(Thread):
             self.nest_popu_plot.set_xdata(self.time_record)
             self.nest_popu_plot.set_ydata(self.nest_population_record)
 
-            n_rats = len(self.rat_list)
-            n_birds = len(self.bird_list)
-            n_nests = len(self.nest_list)
-
-            max_population = max([n_birds, n_rats, n_nests])
-
-            if max_population > self.max_ever_population:
-                self.max_ever_population = max_population
-
             tmp_m = max(self.time_record + [10])
             self.population_dynamics_ax.set_xlim(0, tmp_m)
-            self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 10) # sets the ylim to the largest population there ever was
+
+            n_nests = len(self.nest_list)
+            n_birds = len(self.bird_list)
+            n_rats = len(self.rat_list)
 
             title_str = 'Time: ' + str(self.step_count) + ' n_rats: ' + str(n_rats) + ', n_birds: ' + str(n_birds) + ', n_nests: ' \
                         + str(n_nests)
@@ -344,21 +333,21 @@ class Lattice(Thread):
 if __name__ == '__main__':
     print(datetime.datetime.now())
     lattice_size = 200
-    n_birds = 500
-    n_rats = 10
+    n_birds = 100
+    n_rats = 50
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
-    hatch_prob = .5
     ylim = 200
+
     rat_initial_energy = 10
 
     nutritional_value_of_nests = 100
 
     sim = Lattice(lattice_size, n_rats, n_birds,
-                  n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
+                  n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=False, plot_populations=True)
+                  ylim=ylim, plot_environment=True, plot_populations=True)
     sim.start()
     plt.show()
 
