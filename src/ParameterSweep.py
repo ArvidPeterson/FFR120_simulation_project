@@ -54,12 +54,12 @@ class ParamSweep:
                             nbirds, nrats, self.nest_placement_delay, nutritional_value
                         ))
                         fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
-                        self.save_plot(fig, fname)
+                        self.save_data(fig, fname)
                         plt.close(fig)
 
-    def save_plot(self, fig, name):
-        dir = 'save_data/' + str(name) + '.png'
-        fig.savefig(dir)
+    def save_data(self, fig, name):
+        img_dir = 'save_data/img/' + str(name) + '.png'
+        fig.savefig(img_dir)
 
 
 if __name__ == '__main__':
