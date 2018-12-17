@@ -73,6 +73,7 @@ class Lattice(Thread):
             self.environment_ax = self.fig.add_subplot(111)
         elif self.plot_populations:
             self.population_dynamics_ax = self.fig.add_subplot(111)
+
         self.init_topology()
 
 
@@ -81,15 +82,17 @@ class Lattice(Thread):
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-
             plt.legend()
             plt.grid = True
 
         # ----- init the plotting
-        self.anim = Animation.FuncAnimation(self.fig,
-                                            self.update_plot,
-                                            blit=False,
-                                            interval=50)
+        if self.plot_environment or self.plot_populations:
+            plt.legend()
+            plt.grid = True
+            self.anim = Animation.FuncAnimation(self.fig,
+                                                self.update_plot,
+                                                blit=False,
+                                                interval=50)
 
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)
@@ -120,7 +123,6 @@ class Lattice(Thread):
             if n_alive_birds * n_alive_rats == 0:
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
-        self.population_dynamics_ax.set_ylim([0, self.max_ever_population + 100])
 
         return self.bird_population_record.append(len(self.bird_list)),\
                 self.rat_population_record.append(len(self.rat_list)),\

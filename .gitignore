@@ -4,3 +4,5 @@ venv/
 test_files/
 __pycache__
 *.png
+/save_data
+
