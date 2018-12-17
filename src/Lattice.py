@@ -28,7 +28,7 @@ class Lattice(Thread):
         self.island_center = .5 * self.size
         self.maximum_peak_height = 100
         self.location_matrix = [[[] for _ in range(size)] for _ in range(size)]
-        self.step_count = 0
+        self.step_count = 0  # time step
         self.n_sim_steps = n_sim_steps
 
         # --- agent variables --- #
