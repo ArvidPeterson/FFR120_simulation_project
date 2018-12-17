@@ -51,7 +51,7 @@ class ParamSweep:
                         ax.set_ylabel('Populations')
                         ax.set_title('initial bird population: {}, initial rat population: {}\n'
                                      'hatch time: {}, nest nutritional value: {}'.format(
-                            nbirds, nrats, self.nest_placement_delay, nutritional_value
+                            nbirds, nrats, hatch_time, nutritional_value
                         ))
                         fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
                         self.save_data(fig, fname)
@@ -68,10 +68,10 @@ if __name__ == '__main__':
     hatch_time = 200
     rat_initial_energy = 100
     nest_placement_delay = 100
-    n_sim_steps = int(1e2)
+    n_sim_steps = int(1e4)
 
     # sweeping values
-    rats_initial_populations = [5, 10, 20]
+    rats_initial_populations = [5, 10, 20, ]
     bird_initial_populations = [20, 50, 100, 500]
     hatch_times = [30, 100, 200, 500]
     nutritional_values = [10, 20, 50, 100]
