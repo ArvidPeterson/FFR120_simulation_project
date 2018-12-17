@@ -36,8 +36,7 @@ class ParamSweep:
                                     self.nest_placement_delay, self.rat_energy,
                                     nutritional_value, plot_environment=False,
                                     plot_populations=False)
-                        sim.start()
-                        bird_pop, rat_pop, nest_pop, time = sim.join()
+                        bird_pop, rat_pop, nest_pop, time = sim.run()
                         max_bird_pop = max(bird_pop)
                         max_rat_pop = max(rat_pop)
                         min_bird_pop = min(bird_pop)
@@ -69,13 +68,13 @@ if __name__ == '__main__':
     hatch_time = 200
     rat_initial_energy = 100
     nest_placement_delay = 100
-    n_sim_steps = int(1e3)
+    n_sim_steps = int(1e2)
 
     # sweeping values
-    rats_initial_populations = [5]
-    bird_initial_populations = [20]
-    hatch_times = [100]
-    nutritional_values = [10]
+    rats_initial_populations = [5, 10, 20]
+    bird_initial_populations = [20, 50, 100, 500]
+    hatch_times = [30, 100, 200, 500]
+    nutritional_values = [10, 20, 50, 100]
     sweep = ParamSweep(lattice_size, n_sim_steps, bird_initial_populations,
                        rats_initial_populations,
                        hatch_times, rat_initial_energy,

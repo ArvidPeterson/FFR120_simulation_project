@@ -64,7 +64,9 @@ class Lattice(Thread):
 
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
-        self.fig = plt.figure()
+
+        if self.plot_populations or self.plot_environment:
+            self.fig = plt.figure()
 
         if self.plot_environment and self.plot_populations:
             self.environment_ax = self.fig.add_subplot(121)
@@ -124,10 +126,16 @@ class Lattice(Thread):
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
 
-        return self.bird_population_record.append(len(self.bird_list)),\
-                self.rat_population_record.append(len(self.rat_list)),\
-                self.nest_population_record.append(len(self.nest_list)),\
-                self.time_record.append(i_step)  # Returns to make statistics
+        self.bird_population_record.append(len(self.bird_list))
+        self.rat_population_record.append(len(self.rat_list))
+        self.nest_population_record.append(len(self.nest_list))
+        self.time_record.append(i_step)
+
+        return self.bird_population_record,\
+                self.rat_population_record,\
+                self.nest_population_record,\
+                self.time_record# Returns to make statistics
+
 
     def step(self, i_step):
         self.step_count += 1
