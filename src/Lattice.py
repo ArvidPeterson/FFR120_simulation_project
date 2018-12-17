@@ -11,8 +11,8 @@ from Bird import *
 from Rat import *
 import datetime
 
-class Lattice(Thread):
 
+class Lattice(Thread):
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps,
                  hatch_time, hatch_prob, nest_placement_delay,
@@ -99,7 +99,7 @@ class Lattice(Thread):
         self.topological_map = np.zeros(self.shape)
         for x in range(self.size):
             for y in range(self.size):
-                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2)  < self.island_radius:
+                if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) < self.island_radius:
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
 
@@ -122,8 +122,8 @@ class Lattice(Thread):
             n_alive_rats = len(self.rat_list)
 
             if n_alive_birds * n_alive_rats == 0:
+                # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
-
 
     def step(self, i_step):
         self.step_count += 1
@@ -189,7 +189,7 @@ class Lattice(Thread):
 
         # if we're in the outskirts of the island
         if ymax == ymin:
-            y = int(ymax) - 1  # todo: make sure that they're not placed on perimiter
+            y = int(ymax) - 1  # todo: make sure that they're not placed on peremiter
         else:
             y = np.random.randint(ymin, ymax)
 
@@ -212,8 +212,7 @@ class Lattice(Thread):
             self.recolor(x, y)  # color the new rat location
             self.location_matrix[x][y].append(rat)
             self.plot_matrix[x][y] = self.rat_color_index
-
-            if rat.energy < 0:
+            if rat.energy < 0:  # TODO: Seems like there is a bug, no killing of rats
                 self.kill_agent(rat)
 
             if rat.should_spawn_new_rat:
@@ -349,7 +348,7 @@ if __name__ == '__main__':
     ylim = 200
     rat_initial_energy = 10
 
-    nutritional_value_of_nests = 4
+    nutritional_value_of_nests = 100
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,

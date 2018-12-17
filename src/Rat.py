@@ -16,18 +16,20 @@ class Rat(AgentSuper):  # inherits AgentSuper
         self.time_since_last_spawn = 0
         self.time_to_spawn_new_rat = 100
         self.should_spawn_new_rat = False
-    ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
+        self.init_energy = initial_energy
 
+    ''' Moves the rat one step in pseudo random walk, cannot go back to same position directly'''
     def move(self):
         self.time_since_last_spawn += 1  # increase time since last spawn
         self.set_should_spawn()
         self.life_time += 1  # increase life time
+        if self.energy > self.init_energy:
+            self.energy = self.init_energy
 
         # use this to modulate activity level in rats
         r = np.random.rand()
         if r > self.p_move:
             return [self.x, self.y]
-
 
         x = self.x
         y = self.y
