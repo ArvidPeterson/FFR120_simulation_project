@@ -76,7 +76,6 @@ class Lattice(Thread):
 
         self.init_topology()
 
-
         # ----- create plots for population dynamics
         if self.plot_populations:
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')

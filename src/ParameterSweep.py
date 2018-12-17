@@ -14,10 +14,9 @@ class ParamSweep:
                 hatch_times, rat_initial_energy,
                 nutritional_values, nest_placement_delay):
 
-
         self.size = lattice_size
         self.n_sim_steps = n_sim_steps
-        self.n_birds_range = bird_initial_populations
+        self.n_birds_range = bird_initial_populations  # all these are lists with different settings
         self.n_rats_range = rats_initial_populations
         self.nest_placement_delay = nest_placement_delay
         self.nutritional_values = nutritional_values
@@ -25,9 +24,16 @@ class ParamSweep:
         self.hatch_times = hatch_times
         self.rat_energy = rat_initial_energy
         self.run_simulation()
+        self.simulation_idx = 1
 
 
     def run_simulation(self):
+
+        self.simulation_idx = 1
+        print('Simulation start')
+
+        n_simulations = len(self.hatch_times) * len(self.nutritional_values) * len(self.n_rats_range) * len(self.n_birds_range)
+
         for hatch_time in self.hatch_times:
             for nutritional_value in self.nutritional_values:
                 for nrats in self.n_rats_range:
@@ -58,6 +64,8 @@ class ParamSweep:
                         fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
                         self.save_data(fig, fname, bird_pop=bird_pop)
                         plt.close(fig)
+                        print('simulation ' + str(self.simulation_idx) + '/' + str(n_simulations))
+                        self.simulation_idx += 1
 
     def save_data(self, fig, name, bird_pop=[], rat_pop=[], nest_pop=[], time=[]):
         img_dir = 'save_data/img/' + str(name) + '.png'
@@ -71,7 +79,7 @@ class ParamSweep:
         for ii in range(len(pop_v)):
             pop = pop_v[ii]
             if pop:
-                file_name = num_data_dir + name + '_' + data_name_v[ii]
+                file_name = num_data_dir + name + '_' + data_name_v[ii] + '_' + str(self.simulation_idx)
                 np_data = np.array(pop)
                 np.save(file_name, np_data)
 
@@ -79,13 +87,13 @@ if __name__ == '__main__':
     # fixed values
     lattice_size = 200
     hatch_time = 200
-    rat_initial_energy = 100
+    rat_initial_energy = 4
     nest_placement_delay = 100
-    n_sim_steps = int(1e3)
+    n_sim_steps = int(1e2)
 
     # sweeping values
-    rats_initial_populations = [5]
-    bird_initial_populations = [20]
+    rats_initial_populations = [10]
+    bird_initial_populations = [100]
     hatch_times = [100]
     nutritional_values = [10]
     sweep = ParamSweep(lattice_size, n_sim_steps, bird_initial_populations,
