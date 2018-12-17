@@ -48,7 +48,8 @@ class Lattice(Thread):
         self.rat_population_record = []
         self.nest_population_record = []
         self.time_record = []
-        self.bird_position_set = set()
+        self.available_nesting_sites = set()
+        self.island_positions = set()
 
         # --- booleans for testing purposes --- #
         self.age_birds = False
@@ -100,7 +101,6 @@ class Lattice(Thread):
 
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)
-        self.island_coords = set()
         for x in range(self.size):
             for y in range(self.size):
                 if math.sqrt((x - self.island_center) ** 2 + (y - self.island_center) ** 2) < self.island_radius:
@@ -108,7 +108,9 @@ class Lattice(Thread):
                     self.plot_matrix[x, y] = self.land_color_index
                     self.topological_map[x, y] = 1
                     # keep the books
-                    self.island_coords.add((x, y))
+                    self.island_positions.add((x, y))
+                    self.available_nesting_sites.add((x, y))
+
 
     def run(self):  # since Lattice inherits Thread this is called when doing Lattice.start()
         self.init_agents()
@@ -124,7 +126,10 @@ class Lattice(Thread):
                 self.rat_population_record.append(len(self.rat_list))
                 self.nest_population_record.append(len(self.nest_list))
                 self.time_record.append(i_step)
-
+                stop = time.process_time()
+                #print('iteration: {} took: {}'.format(i_step, stop - start))
+            if i_step % 500 == 0:
+                print('done with {} iteration'.format(i_step))
             # if rats or birds are extinct the simulation stops
             n_alive_birds = len(self.bird_list)
             n_alive_rats = len(self.rat_list)
@@ -146,8 +151,11 @@ class Lattice(Thread):
                 self.nest_population_record,\
                 self.time_record# Returns to make statistics
 
+    def join(self):
+        Thread.join(self)
+        return self.bird_population_record, self.rat_population_record, self.nest_population_record, self.time_record
+
     def step(self, i_step):
-        self.step_count += 1
         self.move_and_age_rats()
         self.move_and_age_birds()
         self.range_vision_kill_function()
@@ -178,50 +186,32 @@ class Lattice(Thread):
                 
     def spawn_bird_and_nest(self):
         x, y = self.gen_bird_starting_pos()
-        bird = Bird(self.size, x, y, self.topological_map, self.bird_lifetime)
-        nest = Nest(self.size, x, y, self.topological_map, self.hatch_time, bird)
-        bird.has_nest = True
-        bird.nest = nest
+        if x > 0 and y > 0:
+            bird = Bird(self.size, x, y, self.topological_map, self.bird_lifetime)
+            nest = Nest(self.size, x, y, self.topological_map, self.hatch_time, bird)
+            bird.has_nest = True
+            bird.nest = nest
 
-        # keep tabs of the book-keeping data
-        self.nest_list.append(nest)
-        self.bird_list.append(bird)
-        self.location_matrix[x][y].append(bird)
-        self.location_matrix[x][y].append(nest)
-        self.bird_position_set.add((x ,y))
-        self.recolor(x, y)
+            # keep tabs of the book-keeping data
+            self.nest_list.append(nest)
+            self.bird_list.append(bird)
+            self.location_matrix[x][y].append(bird)
+            self.location_matrix[x][y].append(nest)
+            self.recolor(x, y)
 
     def gen_rat_starting_pos(self):
-        # generate a random x within island bounds
-        x = np.random.randint((self.island_center - self.island_radius), (self.island_center + self.island_radius))
-
-        # use trig to find y within island bounds as well!
-        x_rel_to_circle = abs(self.island_center - x)
-        y_rel_to_circle = math.sqrt(self.island_radius ** 2 - x_rel_to_circle ** 2)
-        ymax = max((self.island_center + y_rel_to_circle), (self.island_center - y_rel_to_circle))
-        ymin = min((self.island_center + y_rel_to_circle), (self.island_center - y_rel_to_circle))
-
-        # if we're in the outskirts of the island
-        if ymax == ymin:
-            y = int(ymax) - 1  # todo: make sure that they're not placed on peremiter
-        else:
-            y = np.random.randint(ymin, ymax)
-        stop = time.process_time()
-        return x, y
+        pos = random.sample(self.island_positions, 1)
+        return pos[0]
 
     def gen_bird_starting_pos(self):
-        start = time.process_time()
-        island_coords = self.island_coords.copy()
-        allowed_spots = island_coords.difference(self.bird_position_set)
 
-        if not allowed_spots:
-            raise ValueError('No spots left for birds!')
+        if not self.available_nesting_sites:
+            return -1, -1
 
-        pos = random.sample(allowed_spots, 1)
-        stop = time.process_time()
-        #print('time taken to generate pos: {}'.format(stop - start))
+        pos = random.sample(self.available_nesting_sites, 1)
+        self.available_nesting_sites.discard(pos[0])
+
         return pos[0] # need this here as the tuple is wrapped in list for some reason
-
 
     def move_and_age_rats(self):
         for rat in self.rat_list:
@@ -259,7 +249,7 @@ class Lattice(Thread):
             self.rat_list.remove(agent)
 
         if isinstance(agent, Bird):
-            self.bird_position_set.remove((x, y))
+            self.available_nesting_sites.add((x, y))
             self.bird_list.remove(agent)  # remove the bird
             if agent.has_nest:  # also remove nest which otherwise is left dangling
                 self.nest_list.remove(agent.nest)
@@ -382,8 +372,14 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  plot_environment=False,  plot_populations=True)
+                  plot_environment=False,  plot_populations=False)
+    start = time.process_time()
     sim.start()
+    _, _, _, time_record = sim.join()
+    stop = time.process_time()
+    print('entire time: {}'.format(stop - start))
+    print('time-record-len: {}'.format(len(time_record)))
+
     plt.show()
 
 # todo: rats die if they don't have food   ---  DONE!
