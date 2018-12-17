@@ -83,8 +83,8 @@ if __name__ == '__main__':
     n_sim_steps = int(1e4)
 
     # sweeping values
-    rats_initial_populations = [5, 10, 20, ]
-    bird_initial_populations = [20, 50, 100, 500]
+    rats_initial_populations = [5, 10, 20]
+    bird_initial_populations = [100, 500, 1000, int(1e4)]
     hatch_times = [30, 100, 200, 500]
     nutritional_values = [10, 20, 50, 100]
     sweep = ParamSweep(lattice_size, n_sim_steps, bird_initial_populations,

@@ -2,7 +2,7 @@ import logging
 import math
 import numpy as np
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
 import matplotlib.animation as Animation
 import matplotlib.colors as clr
@@ -63,7 +63,7 @@ class Lattice(Thread):
         self.max_ever_population = 1
 
         self.plot_matrix = np.zeros(self.shape)
-        self.cmap = clr.ListedColormap(['blue', 'limegreen', 'red', 'yellow', 'black'])
+        self.cmap = clr.ListedColormap(['aqua', 'g','red', 'yellow', 'black'])
 
         if self.plot_populations or self.plot_environment:
             self.fig = plt.figure()
@@ -359,10 +359,10 @@ class Lattice(Thread):
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
-    lattice_size = 200
+    lattice_size = 60
     n_birds = 500
     n_rats = 10
-    n_sim_steps = int(1e4)
+    n_sim_steps = int(300)
     nest_placement_delay = 200
     hatch_time = 150
 
@@ -373,7 +373,7 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  plot_environment=False,  plot_populations=True)
+                  plot_environment=True,  plot_populations=False)
     sim.start()
     plt.show()
 
