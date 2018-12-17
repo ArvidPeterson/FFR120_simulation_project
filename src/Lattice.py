@@ -18,7 +18,7 @@ class Lattice(Thread):
                  hatch_time, nest_placement_delay,
                  rat_initial_energy, nutritional_value_of_nests,  *,
                  plot_environment=False, plot_populations=True,
-                 ylim = None):
+                 population_plot_title='population'):
         Thread.__init__(self)
         # --- environment and general sim variables --- #
         self.size = size
@@ -75,14 +75,12 @@ class Lattice(Thread):
             self.population_dynamics_ax = self.fig.add_subplot(111)
         self.init_topology()
 
-        self.ylim = max(self.n_rats, self.n_birds) if not ylim else ylim
 
         # ----- create plots for population dynamics
         if self.plot_populations:
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
-            self.population_dynamics_ax.set_ylim(0, self.ylim)
 
         plt.legend()
         plt.grid = True
@@ -294,6 +292,9 @@ class Lattice(Thread):
         if self.plot_environment:
             self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
             self.environment_ax.set_title("time: {}".format(self.step_count))
+            self.environment_ax.set_xlabel('x')
+            self.environment_ax.set_ylabel('y')
+            self.environment_ax.set_aspect('equal')
 
         if self.plot_populations:
             self.rat_popu_plot.set_xdata(self.time_record)
@@ -314,6 +315,8 @@ class Lattice(Thread):
                         + str(n_nests)
 
             self.population_dynamics_ax.set(title=title_str)
+            self.population_dynamics_ax.set_xlabel('Time steps')
+            self.population_dynamics_ax.set_ylabel('Population sizes')
             self.rat_popu_plot.set_xdata(self.time_record)
             self.rat_popu_plot.set_ydata(self.rat_population_record)
 
@@ -356,7 +359,7 @@ if __name__ == '__main__':
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  ylim=ylim, plot_environment=False, plot_populations=True)
+                  plot_environment=False,  plot_populations=True)
     sim.start()
     plt.show()
 
