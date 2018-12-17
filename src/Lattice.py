@@ -15,7 +15,7 @@ import datetime
 class Lattice(Thread):
 
     def __init__(self, size, n_rats, n_birds, n_sim_steps,
-                 hatch_time, hatch_prob, nest_placement_delay,
+                 hatch_time, nest_placement_delay,
                  rat_initial_energy, nutritional_value_of_nests,  *,
                  plot_environment=False, plot_populations=True,
                  ylim = None):
@@ -39,7 +39,6 @@ class Lattice(Thread):
         self.nest_nutritional_value = nutritional_value_of_nests
         self.bird_lifetime = 5000
         self.hatch_time = hatch_time #1000
-        self.hatch_prob = hatch_prob # .4
         self.nest_placement_delay = nest_placement_delay #200
         self.bird_list = []
         self.rat_list = []
@@ -160,11 +159,9 @@ class Lattice(Thread):
         for nest in self.nest_list:
             nest.tick()
             if nest.counter > nest.hatch_time:
-                if np.random.rand() < self.hatch_prob:
-                    nest.hatch()
-                    self.spawn_bird_and_nest()
-                else:
-                    nest.counter = 0
+                nest.hatch()
+                self.spawn_bird_and_nest()
+                nest.counter = 0
                 
     def spawn_bird_and_nest(self):
         x, y = self.gen_unique_starting_pos()
@@ -341,7 +338,6 @@ if __name__ == '__main__':
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 200
-    hatch_prob = .5
     ylim = 200
 
     rat_initial_energy = 10
@@ -349,7 +345,7 @@ if __name__ == '__main__':
     nutritional_value_of_nests = 100
 
     sim = Lattice(lattice_size, n_rats, n_birds,
-                  n_sim_steps, hatch_time, hatch_prob, nest_placement_delay,
+                  n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
                   ylim=ylim, plot_environment=True, plot_populations=True)
     sim.start()
