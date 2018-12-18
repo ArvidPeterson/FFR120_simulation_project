@@ -1,3 +1,4 @@
+import time
 import numpy as np
 from matplotlib import pyplot as plt
 from Lattice import Lattice
@@ -38,34 +39,38 @@ class ParamSweep:
             for nutritional_value in self.nutritional_values:
                 for nrats in self.n_rats_range:
                     for nbirds in self.n_birds_range:
+                        start = time.process_time()
                         sim = Lattice(self.size, nrats, nbirds,
                                     self.n_sim_steps, hatch_time,
                                     self.nest_placement_delay, self.rat_energy,
                                     nutritional_value, plot_environment=False,
                                     plot_populations=False)
                         sim.start()
-                        bird_pop, rat_pop, nest_pop, time = sim.join()
+                        bird_pop, rat_pop, nest_pop, time_record = sim.join()
                         max_bird_pop = max(bird_pop)
                         max_rat_pop = max(rat_pop)
                         min_bird_pop = min(bird_pop)
                         min_rat_pop = min(rat_pop)
                         fig, ax = plt.subplots()
-                        plt.plot(time, bird_pop, color='blue', label='Bird population')
-                        plt.plot(time, nest_pop, color='green', label='Nest population')
-                        plt.plot(time, rat_pop, color='red', label='Rat population')
+                        plt.plot(time_record, bird_pop, color='blue', label='Bird population')
+                        plt.plot(time_record, nest_pop, color='green', label='Nest population')
+                        plt.plot(time_record, rat_pop, color='red', label='Rat population')
                         handles, labels = ax.get_legend_handles_labels()
                         plt.legend(handles, labels)
                         ax.set_xlabel('Time steps')
                         ax.set_ylabel('Populations')
                         ax.set_title('initial bird population: {}, initial rat population: {}\n'
                                      'hatch time: {}, nest nutritional value: {}'.format(
-                            nbirds, nrats, self.nest_placement_delay, nutritional_value
+                            nbirds, nrats, hatch_time, nutritional_value
                         ))
                         fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}'.format(nbirds, nrats, nutritional_value, hatch_time)
                         self.save_data(fig, fname, bird_pop=bird_pop, rat_pop=rat_pop,nest_pop=nest_pop, time=time)
                         plt.close(fig)
+                        
                         print('simulation ' + str(self.simulation_idx) + '/' + str(n_simulations))
                         self.simulation_idx += 1
+                        stop = time.process_time()
+                        print('time taken to generate 1 plot: {}'.format(stop-start))
 
     def save_data(self, fig, name, bird_pop=[], rat_pop=[], nest_pop=[], time=[]):
         img_dir = 'save_data/img/' + str(name) + '.png'
@@ -97,6 +102,7 @@ if __name__ == '__main__':
     bird_initial_populations = [100]
     hatch_times = [100]
     nutritional_values = [10]
+
     sweep = ParamSweep(lattice_size, n_sim_steps, bird_initial_populations,
                        rats_initial_populations,
                        hatch_times, rat_initial_energy,
