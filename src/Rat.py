@@ -14,7 +14,7 @@ class Rat(AgentSuper):  # inherits AgentSuper
         self.energy = initial_energy
         self.p_move = 1.0
         self.time_since_last_spawn = 0
-        self.time_to_spawn_new_rat = 100
+        self.time_to_spawn_new_rat = 20
         self.should_spawn_new_rat = False
         self.init_energy = initial_energy
 

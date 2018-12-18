@@ -303,9 +303,10 @@ class Lattice(Thread):
                     self.location_matrix[x][y].append(bird)
 
     def update_plot(self, i):
+
         if self.plot_environment:
             self.environment_ax.pcolorfast(self.plot_matrix, vmin=0, vmax=5, cmap=self.cmap)
-            self.environment_ax.set_title("time: {}".format(self.step_count))
+            self.environment_ax.set_title("time: {} (days)".format(self.step_count))
             self.environment_ax.set_xlabel('x')
             self.environment_ax.set_ylabel('y')
             self.environment_ax.set_aspect('equal')
@@ -362,23 +363,23 @@ if __name__ == '__main__':
     n_birds = 500
     n_rats = 10
     n_sim_steps = int(1e4)
-    nest_placement_delay = 200
-    hatch_time = 90
+    nest_placement_delay = 25
+    hatch_time = 20
 
     rat_initial_energy = 5
 
-    nutritional_value_of_nests = 100
+    nutritional_value_of_nests = 5
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  plot_environment=False,  plot_populations=False)
+                  plot_environment=False,  plot_populations=True)
     start = time.process_time()
     sim.start()
-    _, _, _, time_record = sim.join()
-    stop = time.process_time()
-    print('entire time: {}'.format(stop - start))
-    print('time-record-len: {}'.format(len(time_record)))
+    #_, _, _, time_record = sim.join()
+    #stop = time.process_time()
+    #print('entire time: {}'.format(stop - start))
+    #print('time-record-len: {}'.format(len(time_record)))
 
     plt.show()
 
