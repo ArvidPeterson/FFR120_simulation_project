@@ -61,8 +61,8 @@ class ParamSweep:
                                      'hatch time: {}, nest nutritional value: {}'.format(
                             nbirds, nrats, self.nest_placement_delay, nutritional_value
                         ))
-                        fname = 'nbirds{}nrats{}nutrition{}hatchtime{}'.format(nbirds, nrats, nutritional_value, hatch_time)
-                        self.save_data(fig, fname, bird_pop=bird_pop)
+                        fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}'.format(nbirds, nrats, nutritional_value, hatch_time)
+                        self.save_data(fig, fname, bird_pop=bird_pop, rat_pop=rat_pop,nest_pop=nest_pop, time=time)
                         plt.close(fig)
                         print('simulation ' + str(self.simulation_idx) + '/' + str(n_simulations))
                         self.simulation_idx += 1
@@ -83,13 +83,14 @@ class ParamSweep:
                 np_data = np.array(pop)
                 np.save(file_name, np_data)
 
+
 if __name__ == '__main__':
     # fixed values
     lattice_size = 200
     hatch_time = 200
     rat_initial_energy = 4
     nest_placement_delay = 100
-    n_sim_steps = int(1e2)
+    n_sim_steps = int(1e3)
 
     # sweeping values
     rats_initial_populations = [10]

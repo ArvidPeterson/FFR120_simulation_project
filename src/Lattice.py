@@ -135,6 +135,7 @@ class Lattice(Thread):
         self.range_vision_kill_function()
         self.build_nests()
         self.age_and_hatch_nests()
+        print(self.step_count)
 
     def join(self):
         Thread.join(self)
@@ -264,7 +265,7 @@ class Lattice(Thread):
                 y = pos[1]
                 for agent in self.location_matrix[pos[0]][pos[1]]:
 
-                    if isinstance(agent, Nest):  # TODO: check for nestless birds as well
+                    if isinstance(agent, Nest):  # rats kill birds that are in nests not 'free' birds who fly away..
                         rat.energy += self.nest_nutritional_value
                         if agent.parent.is_in_nest:  # if bird in nest, kill the bird
                             self.location_matrix[x][y].remove(agent.parent)
@@ -332,7 +333,7 @@ class Lattice(Thread):
             if max_pop > self.max_ever_population:
                 self.max_ever_population = max_pop
 
-            self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 10)
+            self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 100)
 
         plt.draw()
         plt.pause(1e-17)
@@ -355,9 +356,9 @@ if __name__ == '__main__':
     n_rats = 10
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
-    hatch_time = 150
+    hatch_time = 90
 
-    rat_initial_energy = 4
+    rat_initial_energy = 5
 
     nutritional_value_of_nests = 100
 
