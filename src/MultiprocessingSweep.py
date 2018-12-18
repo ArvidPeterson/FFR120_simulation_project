@@ -1,6 +1,8 @@
 import multiprocessing as mp
 from os import getpid
 from Lattice import Lattice
+import matplotlib.pyplot as plt
+import numpy as np
 
 def func(procnum):
     return str(procnum) + " " + str(getpid())
@@ -27,14 +29,17 @@ def run_simulation(params):
 def main():
     # start processes in a thread pool (workaround for threading blocking each other)
     params = gen_params()
+    r_vals = []
     with mp.Pool(4) as p: # I have checked, will only start 4 processes in tandem!
-        r_vals = p.map(run_simulation, params)
-        print(r_vals)
+        populations = p.map(run_simulation, params)
+        r_vals.append(populations)
+
+    plot_and_save(params, r_vals)
 
 def gen_params():
 
     # parameters to sweep over
-    rats_initial_populations = [5, 20, 30, 40, 50, 60, 100]
+    rats_initial_populations = [5]
     bird_initial_populations =  [int(1e4)]
     hatch_times = [200]
     nutritional_values = [10]
@@ -49,7 +54,56 @@ def gen_params():
 
     return params
 
+def plot_and_save(params, data):
+    # r_vals on the form t[wrapper][all lists (bird, nest etc)][data_acess]
+    for i, time_series in enumerate(data[0]):
+        bird_pop, rat_pop, nest_pop, time_record = time_series
+        nrats, nbirds, hatch_time, nutritional_value = params[i]
+
+        # maximum population measures for the plotting!
+        max_bird_pop = max(bird_pop)
+        max_rat_pop = max(rat_pop)
+        min_bird_pop = min(bird_pop)
+        min_rat_pop = min(rat_pop)
+
+        fig, ax = plt.subplots()
+        plt.plot(time_record, bird_pop, color='blue', label='Bird population')
+        plt.plot(time_record, nest_pop, color='green', label='Nest population')
+        plt.plot(time_record, rat_pop, color='red', label='Rat population')
+        handles, labels = ax.get_legend_handles_labels()
+        plt.legend(handles, labels)
+        ax.set_xlabel('Time steps')
+        ax.set_ylabel('Populations')
+        ax.set_title('initial bird population: {}, initial rat population: {}\n'
+                     'hatch time: {}, nest nutritional value: {} \n'
+                     'max bird population: {}, max rat population: {}, \n'
+                     'min bird population: {} min rat population: {}'.format(
+            nbirds, nrats, hatch_time, nutritional_value, max_bird_pop, max_rat_pop, min_bird_pop, min_rat_pop
+        ))
+        fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}_'.format(nbirds, nrats, nutritional_value, hatch_time)
+        plt.grid(True)
+        save_data(fig, fname, bird_pop=bird_pop, rat_pop=rat_pop, nest_pop=nest_pop, time=time_record)
+        plt.close(fig)
+
+def save_data(fig, name, bird_pop=[], rat_pop=[], nest_pop=[], time=[]):
+    img_dir = 'save_data/img/' + str(name) + '.png'
+    fig.savefig(img_dir, dpi = 1000)
+
+    data_name_v = ['bird_pop', 'rat_pop', 'nest_pop', 'time']
+    pop_v = [bird_pop, rat_pop, nest_pop, time]
+
+    num_data_dir = 'save_data/num/'
+
+    for ii in range(len(pop_v)):
+        pop = pop_v[ii]
+        if pop:
+            file_name = num_data_dir + name + '_' + data_name_v[ii]
+            np_data = np.array(pop)
+            np.save(file_name, np_data)
+
+
 if __name__ == '__main__':
     # works - but creating new processes has quite a bit of overhead
     # --> instantiation is slow as fuck
-    main()
+    t = main()
+    print('test')
