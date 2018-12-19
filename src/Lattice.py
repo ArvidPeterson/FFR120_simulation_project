@@ -39,8 +39,8 @@ class Lattice(Thread):
         self.initial_rat_energy = 100
         self.nest_nutritional_value = nutritional_value_of_nests
         self.bird_lifetime = 5000
-        self.hatch_time = hatch_time #1000
-        self.nest_placement_delay = nest_placement_delay #200
+        self.hatch_time = hatch_time
+        self.nest_placement_delay = nest_placement_delay
         self.bird_list = []
         self.rat_list = []
         self.nest_list = []
@@ -68,6 +68,8 @@ class Lattice(Thread):
         self.plot_matrix = np.zeros(self.shape)
         self.cmap = clr.ListedColormap(['aqua', 'g','red', 'yellow', 'black'])
 
+        self.save_img = True  # set this 1 to make save the simulation to gif file
+
         if self.plot_populations or self.plot_environment:
             self.fig = plt.figure()
 
@@ -86,8 +88,9 @@ class Lattice(Thread):
             self.rat_popu_plot, = self.population_dynamics_ax.plot([], [], color='red', label='Rat population')
             self.bird_popu_plot, = self.population_dynamics_ax.plot([], [], color='blue', label='Bird population')
             self.nest_popu_plot, = self.population_dynamics_ax.plot([], [], color='green', label='Nest population')
+            self.population_dynamics_ax.yaxis.set_label_position("right")
             plt.legend()
-            plt.grid = True
+            plt.grid(True)
 
         # ----- init the plotting
         if self.plot_environment or self.plot_populations:
@@ -96,7 +99,7 @@ class Lattice(Thread):
             self.anim = Animation.FuncAnimation(self.fig,
                                                 self.update_plot,
                                                 blit=False,
-                                                interval=50)
+                                                interval=1)
 
     def init_topology(self):
         self.topological_map = np.zeros(self.shape)
@@ -120,7 +123,7 @@ class Lattice(Thread):
             self.step_count = i_step  # why is this changed in two  places ?
 
             # --- save data so that it can be visualized async --- #
-            if i_step % 10 == 0:
+            if i_step % 1 == 0:
                 self.bird_population_record.append(len(self.bird_list))
                 self.rat_population_record.append(len(self.rat_list))
                 self.nest_population_record.append(len(self.nest_list))
@@ -133,7 +136,7 @@ class Lattice(Thread):
             n_alive_birds = len(self.bird_list)
             n_alive_rats = len(self.rat_list)
 
-            if n_alive_birds * n_alive_rats == 0:
+            if n_alive_birds ==0 and n_alive_rats == 0:
                 # self.anim.event_source.stop()  # find a way to stop updating in the other thread
                 break  # quit simulation
 
@@ -160,7 +163,7 @@ class Lattice(Thread):
         self.range_vision_kill_function()
         self.build_nests()
         self.age_and_hatch_nests()
-        print(self.step_count)
+        #print(self.step_count)
 
     def init_agents(self):
         for i_rat in range(self.n_rats):
@@ -327,6 +330,8 @@ class Lattice(Thread):
 
             title_str = 'Time: ' + str(self.step_count) + ' n_rats: ' + str(n_rats) + ', n_birds: ' + str(n_birds) + ', n_nests: ' \
                         + str(n_nests)
+            if self.save_img:
+                title_str = 'Population dynamics'
 
             self.population_dynamics_ax.set(title=title_str)
             self.population_dynamics_ax.set_xlabel('Time steps')
@@ -342,8 +347,12 @@ class Lattice(Thread):
 
             self.population_dynamics_ax.set_ylim(0, self.max_ever_population + 100)
 
+        #plt.tight_layout()
         plt.draw()
         plt.pause(1e-17)
+
+        if self.save_img:
+            self.save_to_gif()
 
     def recolor(self, x, y):
         if Rat in map(type, self.location_matrix[x][y]):
@@ -355,30 +364,35 @@ class Lattice(Thread):
         else:
             self.plot_matrix[x][y] = self.land_color_index
 
+    def save_to_gif(self):
+        img_dir_path = 'save_data/img_to_gif/'
+        img_file_name = 't_' + str(1000 + self.step_count) + '.png'
+        plt.savefig(img_dir_path + img_file_name)
+
 
 if __name__ == '__main__':
     print(datetime.datetime.now())
-    lattice_size = 200
+    lattice_size = 100
     n_birds = 500
     n_rats = 10
     n_sim_steps = int(1e4)
     nest_placement_delay = 200
     hatch_time = 90
 
-    rat_initial_energy = 5
+    rat_initial_energy = 3
 
     nutritional_value_of_nests = 100
 
     sim = Lattice(lattice_size, n_rats, n_birds,
                   n_sim_steps, hatch_time, nest_placement_delay,
                   rat_initial_energy, nutritional_value_of_nests,
-                  plot_environment=False,  plot_populations=False)
+                  plot_environment=True,  plot_populations=True)
     start = time.process_time()
     sim.start()
-    _, _, _, time_record = sim.join()
-    stop = time.process_time()
-    print('entire time: {}'.format(stop - start))
-    print('time-record-len: {}'.format(len(time_record)))
+    #_, _, _, time_record = sim.join()
+    #stop = time.process_time()
+    #print('entire time: {}'.format(stop - start))
+    #print('time-record-len: {}'.format(len(time_record)))
 
     plt.show()
 
