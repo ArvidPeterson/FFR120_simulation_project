@@ -12,7 +12,7 @@ def run_simulation(params):
     size = 200
     nest_placement_delay = 100
     rat_energy = 100
-    n_sim_steps = int(1e2)
+    n_sim_steps = int(3e4)
 
     # parameters which vary are passed in 'params'
     nrats, nbirds, hatch_time, nutritional_value = params
@@ -30,7 +30,7 @@ def main():
     # start processes in a thread pool (workaround for threading blocking each other)
     params = gen_params()
     r_vals = []
-    with mp.Pool(4) as p: # I have checked, will only start 4 processes in tandem!
+    with mp.Pool(2) as p: # I have checked, will only start 4 processes in tandem!
         populations = p.map(run_simulation, params)
         r_vals.append(populations)
 
@@ -39,9 +39,9 @@ def main():
 def gen_params():
 
     # parameters to sweep over
-    rats_initial_populations = [5]
-    bird_initial_populations =  [int(1e4)]
-    hatch_times = [200]
+    rats_initial_populations = [20]
+    bird_initial_populations =  [int(1e3)]
+    hatch_times = [500]
     nutritional_values = [10]
 
     # generate a list of parameter comibinations to run in the sim!
@@ -74,14 +74,14 @@ def plot_and_save(params, data):
         plt.legend(handles, labels)
         ax.set_xlabel('Time steps')
         ax.set_ylabel('Populations')
-        ax.set_title('initial bird population: {}, initial rat population: {}\n'
-                     'hatch time: {}, nest nutritional value: {} \n'
-                     'max bird population: {}, max rat population: {}, \n'
-                     'min bird population: {} min rat population: {}'.format(
-            nbirds, nrats, hatch_time, nutritional_value, max_bird_pop, max_rat_pop, min_bird_pop, min_rat_pop
-        ))
-        fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}_'.format(nbirds, nrats, nutritional_value, hatch_time)
+        ax.set_title('Oscillatory population behavior')
+        fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}_maxbird_{}_maxrat_{}_minbird_{}_minrat_{}'\
+            .format(nbirds, nrats, nutritional_value, hatch_time, max_bird_pop, max_rat_pop, min_bird_pop, min_rat_pop)
         plt.grid(True)
+        ratio = 0.4
+        xleft, xright = ax.get_xlim()
+        ybottom, ytop = ax.get_ylim()
+        ax.set_aspect(abs((xright - xleft) / (ybottom - ytop)) * ratio)
         save_data(fig, fname, bird_pop=bird_pop, rat_pop=rat_pop, nest_pop=nest_pop, time=time_record)
         plt.close(fig)
 
