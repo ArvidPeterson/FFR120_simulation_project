@@ -11,7 +11,7 @@ def run_simulation(params):
     # parameters for the simulation
     size = 200
     nest_placement_delay = 100
-    rat_energy = 100
+    rat_energy = 400 # should be 100
     n_sim_steps = int(3e4)
 
     # parameters which vary are passed in 'params'
@@ -39,10 +39,10 @@ def main():
 def gen_params():
 
     # parameters to sweep over
-    rats_initial_populations = [20]
+    rats_initial_populations = [200]
     bird_initial_populations =  [int(1e3)]
     hatch_times = [500]
-    nutritional_values = [10]
+    nutritional_values = [100]
 
     # generate a list of parameter comibinations to run in the sim!
     params = []
@@ -74,20 +74,21 @@ def plot_and_save(params, data):
         plt.legend(handles, labels)
         ax.set_xlabel('Time steps')
         ax.set_ylabel('Populations')
-        ax.set_title('Oscillatory population behavior')
+        ax.set_title('Bird extinction')
         fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}_maxbird_{}_maxrat_{}_minbird_{}_minrat_{}'\
             .format(nbirds, nrats, nutritional_value, hatch_time, max_bird_pop, max_rat_pop, min_bird_pop, min_rat_pop)
-        plt.grid(True)
-        ratio = 0.4
+        ratio = 0.3
         xleft, xright = ax.get_xlim()
         ybottom, ytop = ax.get_ylim()
         ax.set_aspect(abs((xright - xleft) / (ybottom - ytop)) * ratio)
+        #plt.axis('off')
+        plt.gca().set_position([0,0,1,1])
         save_data(fig, fname, bird_pop=bird_pop, rat_pop=rat_pop, nest_pop=nest_pop, time=time_record)
         plt.close(fig)
 
 def save_data(fig, name, bird_pop=[], rat_pop=[], nest_pop=[], time=[]):
-    img_dir = 'save_data/img/' + str(name) + '.png'
-    fig.savefig(img_dir, dpi = 1000)
+    img_dir = 'save_data/img/' + str(name) + '.svg'
+    fig.savefig(img_dir, dpi = 1000, bbox_inches='tight')
 
     data_name_v = ['bird_pop', 'rat_pop', 'nest_pop', 'time']
     pop_v = [bird_pop, rat_pop, nest_pop, time]
