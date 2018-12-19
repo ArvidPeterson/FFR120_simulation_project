@@ -1,7 +1,7 @@
 import os
 import imageio
 
-png_directory_path = 'save_data/img_to_gif/'
+png_directory_path = 'save_data/img_to_gif/'  # TODO: MAKE SURE THIS DIRECTORIES EXIST!
 gif_directory_path = 'save_data/img_to_gif/gif/'
 
 files = os.listdir(png_directory_path)
