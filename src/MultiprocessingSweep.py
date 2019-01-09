@@ -11,7 +11,7 @@ def run_simulation(params):
     # parameters for the simulation
     size = 200
     nest_placement_delay = 100
-    rat_energy = 400 # should be 100
+    rat_energy = 100 # should be 100
     n_sim_steps = int(3e4)
 
     # parameters which vary are passed in 'params'
@@ -39,10 +39,10 @@ def main():
 def gen_params():
 
     # parameters to sweep over
-    rats_initial_populations = [200]
+    rats_initial_populations = [20]
     bird_initial_populations =  [int(1e3)]
     hatch_times = [500]
-    nutritional_values = [100]
+    nutritional_values = [10]
 
     # generate a list of parameter comibinations to run in the sim!
     params = []
@@ -74,7 +74,8 @@ def plot_and_save(params, data):
         plt.legend(handles, labels)
         ax.set_xlabel('Time steps')
         ax.set_ylabel('Populations')
-        ax.set_title('Bird extinction')
+        #ax.set_title('
+        ax.set_title('Oscillatory population behavior')
         fname = 'nbirds_{}_nrats_{}_nutrition_{}_hatchtime_{}_maxbird_{}_maxrat_{}_minbird_{}_minrat_{}'\
             .format(nbirds, nrats, nutritional_value, hatch_time, max_bird_pop, max_rat_pop, min_bird_pop, min_rat_pop)
         ratio = 0.3
